@@ -83,7 +83,7 @@ export default function App() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg)' }}>
+    <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg)', overflow: 'hidden' }}>
       
       {/* Top Navigation */}
       <Navbar 
@@ -95,7 +95,7 @@ export default function App() {
       />
 
       {/* Main Content Area */}
-      <main style={{ flex: 1, padding: '32px 0 60px' }}>
+      <main style={{ flex: 1, padding: '32px 0 16px' }}>
         <div className="container">
           
           {loading && !stats ? (

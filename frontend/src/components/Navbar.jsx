@@ -15,6 +15,14 @@ export default function Navbar({ currentTab, setCurrentTab, stats, onRunSimulati
   const navRef = useRef(null);
   const buttonRefs = useRef({});
   const [indicator, setIndicator] = useState({ left: 0, width: 0, ready: false });
+  const [btnWidth, setBtnWidth] = useState(null);
+
+  // On mount: find the widest button and lock all to that width
+  useEffect(() => {
+    const widths = Object.values(buttonRefs.current).map(el => el?.getBoundingClientRect().width || 0);
+    const max = Math.max(...widths);
+    if (max > 0) setBtnWidth(max);
+  }, []);
 
   // Update the indicator position whenever the active tab changes
   useEffect(() => {
@@ -30,7 +38,7 @@ export default function Navbar({ currentTab, setCurrentTab, stats, onRunSimulati
       width: btnRect.width,
       ready: true,
     });
-  }, [currentTab]);
+  }, [currentTab, btnWidth]);
 
   return (
     <header style={{
@@ -82,8 +90,10 @@ export default function Navbar({ currentTab, setCurrentTab, stats, onRunSimulati
                 style={{
                   display: 'flex',
                   alignItems: 'center',
+                  justifyContent: 'center',
                   gap: '6px',
                   padding: '6px 14px',
+                  width: btnWidth ? `${btnWidth}px` : undefined,
                   fontSize: '0.82rem',
                   fontWeight: active ? 600 : 400,
                   fontFamily: 'var(--font-sans)',
@@ -95,6 +105,7 @@ export default function Navbar({ currentTab, setCurrentTab, stats, onRunSimulati
                   transition: 'color 0.2s ease',
                   position: 'relative',
                   zIndex: 1,
+                  whiteSpace: 'nowrap',
                 }}
                 onMouseEnter={e => { if (!active) e.currentTarget.style.color = 'var(--bg)'; }}
                 onMouseLeave={e => { if (!active) e.currentTarget.style.color = 'rgba(242,242,240,0.7)'; }}

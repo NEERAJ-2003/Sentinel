@@ -161,10 +161,10 @@ export default function DashboardView({ stats, runs, onSelectRun, onNavigate, on
             </button>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', maxHeight: '320px', overflowY: 'auto' }}>
             {runs.length === 0
               ? <p style={S.sub}>No agent runs recorded yet.</p>
-              : runs.slice(0, 5).map(r => (
+              : runs.slice(0, 4).map(r => (
                 <div
                   key={r.id}
                   onClick={() => onSelectRun(r.id)}
@@ -214,10 +214,10 @@ export default function DashboardView({ stats, runs, onSelectRun, onNavigate, on
             </div>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '320px', overflowY: 'auto' }}>
             {recentEvents.length === 0
               ? <p style={S.sub}>No recent events.</p>
-              : recentEvents.slice(0, 6).map((ev, idx) => (
+              : recentEvents.slice(0, 4).map((ev, idx) => (
                 <div
                   key={ev.id}
                   style={{

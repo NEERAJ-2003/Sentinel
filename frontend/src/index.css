@@ -35,8 +35,8 @@ body {
   font-size: 14px;
   font-weight: 400;
   line-height: 1.6;
-  min-height: 100vh;
-  overflow-x: hidden;
+  height: 100vh;
+  overflow: hidden;
 }
 
 /* Scrollbar */
