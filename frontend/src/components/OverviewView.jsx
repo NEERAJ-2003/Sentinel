@@ -28,7 +28,7 @@ export default function OverviewView({ onNavigate, onRunSimulation, isSimulating
     { id: 'pipeline', label: '1. The 6-Stage Pipeline', icon: Layers },
     { id: 'problem',  label: '2. Problem & Solution',     icon: AlertTriangle },
     { id: 'schema',   label: '3. Database Model (4 Tables)', icon: Database },
-    { id: 'demo',     label: '4. Live Demo Guide for Judges', icon: Sparkles }
+    { id: 'demo',     label: '4. Live Demo Guide', icon: Sparkles }
   ];
 
   // Update sliding indicator whenever activeTab changes or window resizes
@@ -67,102 +67,104 @@ export default function OverviewView({ onNavigate, onRunSimulation, isSimulating
     <div className="view-enter" style={{ display: 'flex', flexDirection: 'column', gap: '28px', maxWidth: '1100px', margin: '0 auto', paddingBottom: '40px' }}>
       
       {/* ── Hero Pitch Banner ─────────────────────────────────── */}
-      <div style={{
-        background: 'var(--surface)',
-        border: '1px solid var(--border)',
-        borderRadius: '16px',
-        padding: '36px 32px',
-        boxShadow: '0 4px 24px rgba(16, 16, 16, 0.04)',
-        position: 'relative',
-        overflow: 'hidden'
-      }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '20px' }}>
-          <div style={{ maxWidth: '680px' }}>
-            
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-              <span className="badge badge-verified" style={{ padding: '3px 8px', fontSize: '0.68rem' }}>
-                Active Governance Engine
-              </span>
-            </div>
-
-            <h1 style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--ink)', letterSpacing: '-0.02em', lineHeight: 1.25, marginBottom: '12px' }}>
-              Sentinel — Cryptographic Trust & Governance for IBM Bob
-            </h1>
-
-            <p style={{ fontSize: '0.95rem', color: 'var(--muted)', lineHeight: 1.6, marginBottom: '20px' }}>
-              Autonomous coding agents have the power to create features, but also to execute destructive commands (<code style={{ fontSize: '0.82rem', color: 'var(--danger)' }}>rm -rf</code>, <code style={{ fontSize: '0.82rem', color: 'var(--danger)' }}>drop table</code>, sensitive file deletions). 
-              <strong> Sentinel</strong> inserts an active control loop that evaluates risk, halts dangerous operations for human approval, and cryptographically seals every action with a <strong>SHA-256 hash chain</strong>.
-            </p>
-
-            {/* Quick Actions */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-              <button
-                onClick={() => onNavigate('dashboard')}
-                className="btn btn-primary"
-                style={{ padding: '10px 22px', fontSize: '0.88rem', background: 'var(--ink)', color: 'var(--bg)', borderColor: 'var(--ink)' }}
-              >
-                <Activity size={16} />
-                <span>Open Dashboard</span>
-                <ArrowRight size={15} />
-              </button>
-
-              <button
-                onClick={onRunSimulation}
-                disabled={isSimulating}
-                className="btn btn-secondary"
-                style={{ padding: '10px 20px', fontSize: '0.88rem' }}
-              >
-                <Play size={15} color="var(--accent)" />
-                <span>{isSimulating ? 'Injecting Telemetry…' : 'Simulate Bob Run'}</span>
-              </button>
-
-              <button
-                onClick={() => onNavigate('verify')}
-                className="btn btn-secondary"
-                style={{ padding: '10px 20px', fontSize: '0.88rem' }}
-              >
-                <Lock size={15} color="var(--success)" />
-                <span>Tamper Verification Lab</span>
-              </button>
-            </div>
-
-          </div>
-
-          {/* Quick Paradigm Summary Badge */}
-          <div style={{
-            background: 'var(--bg)',
-            border: '1px solid var(--border)',
-            borderRadius: '12px',
-            padding: '20px',
-            minWidth: '260px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '12px'
-          }}>
-            <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', fontWeight: 700, color: 'var(--muted)', letterSpacing: '0.05em' }}>
-              Core Value Shift
-            </div>
-
-            <div>
-              <div style={{ fontSize: '0.75rem', color: 'var(--muted)', textDecoration: 'line-through' }}>
-                Passive Observability:
+      <div className="comet-card-wrap comet-yellow" style={{ borderRadius: '16px' }}>
+        <div style={{
+          background: 'var(--surface)',
+          border: '1px solid var(--border)',
+          borderRadius: '16px',
+          padding: '36px 32px',
+          boxShadow: '0 4px 24px rgba(16, 16, 16, 0.04)',
+          position: 'relative',
+          zIndex: 0,
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '20px' }}>
+            <div style={{ maxWidth: '680px' }}>
+              
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+                <span className="badge badge-verified" style={{ padding: '3px 8px', fontSize: '0.68rem' }}>
+                  Active Governance Engine
+                </span>
               </div>
-              <div style={{ fontSize: '0.78rem', color: 'var(--muted)', fontFamily: 'monospace' }}>
-                Bob → Log → DB → View
+
+              <h1 style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--ink)', letterSpacing: '-0.02em', lineHeight: 1.25, marginBottom: '12px' }}>
+                Sentinel — Cryptographic Trust & Governance for IBM Bob
+              </h1>
+
+              <p style={{ fontSize: '0.95rem', color: 'var(--muted)', lineHeight: 1.6, marginBottom: '20px' }}>
+                Autonomous coding agents have the power to create features, but also to execute destructive commands (<code style={{ fontSize: '0.82rem', color: 'var(--danger)' }}>rm -rf</code>, <code style={{ fontSize: '0.82rem', color: 'var(--danger)' }}>drop table</code>, sensitive file deletions). 
+                <strong> Sentinel</strong> inserts an active control loop that evaluates risk, halts dangerous operations for human approval, and cryptographically seals every action with a <strong>SHA-256 hash chain</strong>.
+              </p>
+
+              {/* Quick Actions */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                <button
+                  onClick={() => onNavigate('dashboard')}
+                  className="btn btn-primary"
+                  style={{ padding: '10px 22px', fontSize: '0.88rem', background: 'var(--ink)', color: 'var(--bg)', borderColor: 'var(--ink)' }}
+                >
+                  <Activity size={16} />
+                  <span>Open Dashboard</span>
+                  <ArrowRight size={15} />
+                </button>
+
+                <button
+                  onClick={onRunSimulation}
+                  disabled={isSimulating}
+                  className="btn btn-secondary"
+                  style={{ padding: '10px 20px', fontSize: '0.88rem' }}
+                >
+                  <Play size={15} color="var(--accent)" />
+                  <span>{isSimulating ? 'Injecting Telemetry…' : 'Simulate Bob Run'}</span>
+                </button>
+
+                <button
+                  onClick={() => onNavigate('verify')}
+                  className="btn btn-secondary"
+                  style={{ padding: '10px 20px', fontSize: '0.88rem' }}
+                >
+                  <Lock size={15} color="var(--success)" />
+                  <span>Tamper Verification Lab</span>
+                </button>
               </div>
+
             </div>
 
-            <div style={{ borderTop: '1px solid var(--border)', paddingTop: '10px' }}>
-              <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--success)' }}>
-                Active Governance:
+            {/* Quick Paradigm Summary Badge */}
+            <div style={{
+              background: 'var(--bg)',
+              border: '1px solid var(--border)',
+              borderRadius: '12px',
+              padding: '20px',
+              minWidth: '260px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '12px'
+            }}>
+              <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', fontWeight: 700, color: 'var(--muted)', letterSpacing: '0.05em' }}>
+                Core Value Shift
               </div>
-              <div style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--ink)', fontFamily: 'monospace' }}>
-                Bob → Observe → Analyze → Control → Record → Verify
-              </div>
-            </div>
 
-            <div style={{ borderTop: '1px solid var(--border)', paddingTop: '10px', fontSize: '0.72rem', color: 'var(--muted)' }}>
-              Stack: Python FastAPI + PostgreSQL + React 18
+              <div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--muted)', textDecoration: 'line-through' }}>
+                  Passive Observability:
+                </div>
+                <div style={{ fontSize: '0.78rem', color: 'var(--muted)', fontFamily: 'monospace' }}>
+                  Bob → Log → DB → View
+                </div>
+              </div>
+
+              <div style={{ borderTop: '1px solid var(--border)', paddingTop: '10px' }}>
+                <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--success)' }}>
+                  Active Governance:
+                </div>
+                <div style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--ink)', fontFamily: 'monospace' }}>
+                  Bob → Observe → Analyze → Control → Record → Verify
+                </div>
+              </div>
+
+              <div style={{ borderTop: '1px solid var(--border)', paddingTop: '10px', fontSize: '0.72rem', color: 'var(--muted)' }}>
+                Stack: Python FastAPI + PostgreSQL + React 18
+              </div>
             </div>
           </div>
         </div>

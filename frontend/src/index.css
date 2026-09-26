@@ -415,7 +415,7 @@ button, input, select, textarea {
   content: '';
   position: absolute;
   inset: -1px;
-  border-radius: 13px;
+  border-radius: inherit;
   padding: 2px;
   z-index: 2;
   animation: comet-spin-uniform 18s linear infinite;
@@ -470,14 +470,14 @@ button, input, select, textarea {
   );
 }
 
-/* ── Yellow (Pending Approvals) — Deep Amber ── */
+/* ── Yellow (Pending Approvals / Overview Accent) — Sentinel Overview Yellow (#E8A33D) ── */
 .comet-card-wrap.comet-yellow::before {
   background: conic-gradient(
     from var(--angle-comet, 0deg),
     transparent 0deg,
     transparent 310deg,
-    rgba(175,90,5,0.25)  330deg,
-    rgba(175,90,5,0.75)  352deg,
-    rgba(175,90,5,1)     360deg
+    rgba(232,163,61,0.25)  330deg,
+    rgba(232,163,61,0.75)  352deg,
+    rgba(232,163,61,1)     360deg
   );
 }

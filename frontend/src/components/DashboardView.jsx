@@ -145,10 +145,10 @@ export default function DashboardView({
           label="Pending Approvals"
           value={pendingApprovals}
           subtext={pendingApprovals > 0 ? 'Action required in Approval Queue →' : 'Zero tasks paused'}
-          accent="175,90,5"
-          icon={<ShieldAlert size={17} color="rgb(175,90,5)" />}
+          accent="232,163,61"
+          icon={<ShieldAlert size={17} color="rgb(232,163,61)" />}
           cometClass="comet-yellow"
-          numColor="rgb(175,90,5)"
+          numColor="rgb(232,163,61)"
           clickable={pendingApprovals > 0}
           onClick={() => pendingApprovals > 0 && onNavigate('approvals')}
         />
