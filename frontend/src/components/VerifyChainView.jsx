@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { RefreshCw, AlertOctagon, Flame, RotateCcw, CheckCircle2, XCircle } from 'lucide-react';
+import { RefreshCw, Check, AlertOctagon, Flame, RotateCcw, CheckCircle2, XCircle } from 'lucide-react';
 import { api } from '../services/api';
 import CustomSelect from './CustomSelect';
 
@@ -15,17 +15,21 @@ export default function VerifyChainView({ runs, selectedRunId, onSelectRun, onRe
   const [verificationData, setVerificationData] = useState(null);
   const [runDetail, setRunDetail] = useState(null);
   const [isVerifying, setIsVerifying]   = useState(false);
+  const [verifiedDone, setVerifiedDone] = useState(false);
   const [isTampering, setIsTampering]   = useState(false);
   const [isRestoring, setIsRestoring]   = useState(false);
   const [notification, setNotification] = useState(null);
   const [barWidth, setBarWidth] = useState(0);
-  const barRafRef = useRef(null);
+  const barRafRef   = useRef(null);
+  const manualRef   = useRef(false);
 
   useEffect(() => { if (selectedRunId) setCurrentRunId(selectedRunId); }, [selectedRunId]);
   useEffect(() => { if (currentRunId) runVerification(currentRunId); }, [currentRunId]);
 
-  async function runVerification(runId) {
+  async function runVerification(runId, manual = false) {
     setIsVerifying(true);
+    setVerifiedDone(false);
+    manualRef.current = manual;
     try {
       const [verifRes, detailRes] = await Promise.all([
         api.verifyRun(runId),
@@ -40,6 +44,7 @@ export default function VerifyChainView({ runs, selectedRunId, onSelectRun, onRe
       });
       setVerificationData(verifRes);
       setRunDetail(detailRes);
+      if (manualRef.current && verifRes?.verified) setVerifiedDone(true);
       onRefreshStats && onRefreshStats();
     } catch (err) {
       console.error('Verification failed:', err);
@@ -106,12 +111,54 @@ export default function VerifyChainView({ runs, selectedRunId, onSelectRun, onRe
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
             <button
-              onClick={() => runVerification(currentRunId)}
+              onClick={() => runVerification(currentRunId, true)}
               disabled={isVerifying}
               className="btn btn-secondary"
+              style={{
+                borderColor: verifiedDone ? 'var(--success)' : undefined,
+                transition: 'border-color 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+              }}
             >
-              <RefreshCw size={14} className={isVerifying ? 'spin' : ''} />
-              {isVerifying ? 'Verifying…' : 'Verify Chain'}
+              {/* Icon slot — both icons share the same 14×14 cell via CSS grid stacking */}
+              <span style={{
+                display: 'grid', width: 14, height: 14, flexShrink: 0,
+              }}>
+                <span style={{
+                  gridArea: '1/1', display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                  opacity: verifiedDone ? 0 : 1,
+                  transition: 'opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+                }}>
+                  <RefreshCw size={14} className={isVerifying ? 'spin' : ''} />
+                </span>
+                <span style={{
+                  gridArea: '1/1', display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                  color: 'var(--success)',
+                  opacity: verifiedDone ? 1 : 0,
+                  transition: 'opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+                }}>
+                  <Check size={14} />
+                </span>
+              </span>
+
+              {/* Text slot — both labels share the same grid cell, crossfade after icon */}
+              <span style={{ display: 'grid' }}>
+                <span style={{
+                  gridArea: '1/1', whiteSpace: 'nowrap',
+                  opacity: verifiedDone ? 0 : 1,
+                  transition: 'opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.5s',
+                }}>
+                  {isVerifying ? 'Verifying…' : 'Verify Chain'}
+                </span>
+                <span style={{
+                  gridArea: '1/1', whiteSpace: 'nowrap',
+                  color: 'var(--success)',
+                  opacity: verifiedDone ? 1 : 0,
+                  transition: 'opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.5s',
+                  pointerEvents: 'none',
+                }}>
+                  Verified
+                </span>
+              </span>
             </button>
 
             <button
