@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
+import OverviewView from './components/OverviewView';
 import DashboardView from './components/DashboardView';
 import TimelineView from './components/TimelineView';
 import ApprovalQueueView from './components/ApprovalQueueView';
@@ -7,7 +8,7 @@ import VerifyChainView from './components/VerifyChainView';
 import { api } from './services/api';
 
 export default function App() {
-  const [currentTab, setCurrentTab] = useState('dashboard');
+  const [currentTab, setCurrentTab] = useState('overview');
   const [stats, setStats] = useState(null);
   const [runs, setRuns] = useState([]);
   const [pendingApprovals, setPendingApprovals] = useState([]);
@@ -82,6 +83,10 @@ export default function App() {
     setCurrentTab('timeline');
   }
 
+  function handleLogoClick() {
+    setCurrentTab('overview');
+  }
+
   return (
     <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg)', overflow: 'hidden' }}>
       
@@ -92,6 +97,7 @@ export default function App() {
         stats={stats}
         onRunSimulation={handleRunSimulation}
         isSimulating={isSimulating}
+        onOpenArchitecture={handleLogoClick}
       />
 
       {/* Main Content Area */}
@@ -107,6 +113,14 @@ export default function App() {
             </div>
           ) : (
             <div key={currentTab} className="view-enter">
+              {currentTab === 'overview' && (
+                <OverviewView
+                  onNavigate={setCurrentTab}
+                  onRunSimulation={handleRunSimulation}
+                  isSimulating={isSimulating}
+                />
+              )}
+
               {currentTab === 'dashboard' && (
                 <DashboardView
                   stats={stats}

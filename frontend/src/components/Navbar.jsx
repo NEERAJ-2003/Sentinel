@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { ShieldCheck, Activity, Clock, AlertTriangle, Play, Lock } from 'lucide-react';
 
-export default function Navbar({ currentTab, setCurrentTab, stats, onRunSimulation, isSimulating }) {
+export default function Navbar({ currentTab, setCurrentTab, stats, onRunSimulation, isSimulating, onOpenArchitecture }) {
   const pendingCount = stats?.pending_approvals || 0;
   const isCompromised = stats?.chain_status === 'COMPROMISED';
 
@@ -26,9 +26,17 @@ export default function Navbar({ currentTab, setCurrentTab, stats, onRunSimulati
 
   // Update the indicator position whenever the active tab changes
   useEffect(() => {
+    if (currentTab === 'overview') {
+      setIndicator(prev => ({ ...prev, ready: false }));
+      return;
+    }
+
     const activeBtn = buttonRefs.current[currentTab];
     const nav = navRef.current;
-    if (!activeBtn || !nav) return;
+    if (!activeBtn || !nav) {
+      setIndicator(prev => ({ ...prev, ready: false }));
+      return;
+    }
 
     const navRect = nav.getBoundingClientRect();
     const btnRect = activeBtn.getBoundingClientRect();
@@ -50,35 +58,72 @@ export default function Navbar({ currentTab, setCurrentTab, stats, onRunSimulati
     }}>
       <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '60px', gap: '16px' }}>
 
-        {/* Brand */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
+        {/* Brand — Clickable to open full Architecture & Pitch Overview */}
+        <div 
+          onClick={() => {
+            if (onOpenArchitecture) onOpenArchitecture();
+            else setCurrentTab('overview');
+          }}
+          style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '10px', 
+            flexShrink: 0,
+            cursor: 'pointer',
+            padding: '6px 12px',
+            borderRadius: '8px',
+            background: currentTab === 'overview' ? 'rgba(255, 255, 255, 0.12)' : 'transparent',
+            border: currentTab === 'overview' ? '1px solid rgba(232, 163, 61, 0.5)' : '1px solid transparent',
+            transition: 'all 0.2s ease',
+          }}
+          onMouseEnter={e => {
+            if (currentTab !== 'overview') e.currentTarget.style.background = 'rgba(255,255,255,0.08)';
+          }}
+          onMouseLeave={e => {
+            if (currentTab !== 'overview') e.currentTarget.style.background = 'transparent';
+          }}
+          title="Click to view Sentinel System Architecture & Overview"
+        >
           <ShieldCheck size={22} color="var(--accent)" />
           <span style={{ fontSize: '1rem', fontWeight: '700', color: 'var(--bg)', letterSpacing: '0.05em' }}>
             SENTINEL
+          </span>
+          <span style={{
+            fontSize: '0.65rem',
+            fontWeight: 700,
+            background: currentTab === 'overview' ? 'var(--accent)' : 'rgba(232, 163, 61, 0.18)',
+            color: currentTab === 'overview' ? 'var(--ink)' : 'var(--accent)',
+            border: '1px solid rgba(232, 163, 61, 0.4)',
+            padding: '2px 8px',
+            borderRadius: '4px',
+            letterSpacing: '0.05em',
+            textTransform: 'uppercase',
+            transition: 'all 0.2s ease',
+          }}>
+            Overview
           </span>
         </div>
 
         {/* Nav tabs */}
         <nav ref={navRef} style={{ display: 'flex', alignItems: 'center', gap: '4px', position: 'relative' }}>
 
-          {/* Sliding active indicator */}
-          {indicator.ready && (
-            <span
-              style={{
-                position: 'absolute',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                left: indicator.left,
-                width: indicator.width,
-                height: '34px',
-                background: 'var(--bg)',
-                borderRadius: '6px',
-                transition: 'left 0.28s cubic-bezier(0.4, 0, 0.2, 1), width 0.28s cubic-bezier(0.4, 0, 0.2, 1)',
-                pointerEvents: 'none',
-                zIndex: 0,
-              }}
-            />
-          )}
+          {/* Sliding active indicator — vanishes smoothly when currentTab is 'overview' */}
+          <span
+            style={{
+              position: 'absolute',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              left: indicator.left,
+              width: indicator.width,
+              height: '34px',
+              background: 'var(--bg)',
+              borderRadius: '6px',
+              transition: 'left 0.28s cubic-bezier(0.4, 0, 0.2, 1), width 0.28s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease',
+              opacity: (indicator.ready && currentTab !== 'overview') ? 1 : 0,
+              pointerEvents: 'none',
+              zIndex: 0,
+            }}
+          />
 
           {NAV.map(({ id, label, Icon, badge, alert }) => {
             const active = currentTab === id;

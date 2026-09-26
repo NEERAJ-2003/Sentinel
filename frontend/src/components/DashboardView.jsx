@@ -45,7 +45,14 @@ function StatCard({ label, value, subtext, icon, accent, onClick, clickable }) {
   );
 }
 
-export default function DashboardView({ stats, runs, onSelectRun, onNavigate, onRunSimulation, isSimulating }) {
+export default function DashboardView({ 
+  stats, 
+  runs, 
+  onSelectRun, 
+  onNavigate, 
+  onRunSimulation, 
+  isSimulating
+}) {
   const activeRuns       = stats?.active_runs       || 0;
   const totalEvents      = stats?.total_events      || 0;
   const riskyActions     = stats?.risky_actions     || 0;
@@ -61,7 +68,7 @@ export default function DashboardView({ stats, runs, onSelectRun, onNavigate, on
     <div className="view-enter" style={S.section}>
 
       {/* ── Page header ────────────────────────────────────── */}
-      <div style={{ ...S.row, marginBottom: '4px' }}>
+      <div style={{ ...S.row, marginBottom: '16px' }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
             <span className="badge badge-verified">Active Governance Engine</span>
