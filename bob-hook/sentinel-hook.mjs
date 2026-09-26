@@ -32,7 +32,7 @@ function loadEnv() {
 
 loadEnv();
 
-const BASE_URL = process.env.SENTINEL_API_URL ?? "http://localhost:3000";
+const BASE_URL = process.env.SENTINEL_API_URL ?? "http://localhost:8000";
 const RUN_ID = `sim-${Date.now()}`;
 
 async function log(eventType, action, target, metadata = null) {
