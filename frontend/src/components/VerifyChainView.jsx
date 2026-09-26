@@ -109,7 +109,7 @@ export default function VerifyChainView({ runs, selectedRunId, onSelectRun, onRe
             </p>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap', overflow: 'hidden' }}>
             <button
               onClick={() => runVerification(currentRunId, true)}
               disabled={isVerifying}
@@ -179,16 +179,24 @@ export default function VerifyChainView({ runs, selectedRunId, onSelectRun, onRe
               Demo Tamper
             </button>
 
-            {isFailed && (
+            {/* Restore Chain — always rendered, slides in/out via wrapper width */}
+            <span style={{
+              display: 'inline-flex',
+              maxWidth: isFailed ? '200px' : '0px',
+              opacity: isFailed ? 1 : 0,
+              overflow: 'hidden',
+              transition: 'max-width 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+            }}>
               <button
                 onClick={handleRestoreChain}
                 disabled={isRestoring}
                 className="btn btn-approve"
+                style={{ flexShrink: 0, whiteSpace: 'nowrap' }}
               >
                 <RotateCcw size={14} />
                 Restore Chain
               </button>
-            )}
+            </span>
           </div>
         </div>
 
