@@ -83,7 +83,7 @@ export default function App() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg)' }}>
       
       {/* Top Navigation */}
       <Navbar 
@@ -99,18 +99,10 @@ export default function App() {
         <div className="container">
           
           {loading && !stats ? (
-            <div style={{ padding: '80px', textAlign: 'center', color: '#94A3B8' }}>
-              <div style={{
-                display: 'inline-block',
-                width: '32px',
-                height: '32px',
-                border: '3px solid rgba(6,182,212,0.3)',
-                borderTopColor: '#06B6D4',
-                borderRadius: '50%',
-                animation: 'spin 1s linear infinite'
-              }} />
-              <div style={{ marginTop: '16px', fontSize: '0.9rem' }}>
-                Connecting to Sentinel Trust Engine...
+            <div style={{ padding: '80px', textAlign: 'center', color: 'var(--muted)' }}>
+              <div className="spinner" style={{ margin: '0 auto 16px' }} />
+              <div style={{ fontSize: '0.9rem' }}>
+                Connecting to Sentinel Trust Engine…
               </div>
             </div>
           ) : (
@@ -158,15 +150,13 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <footer style={{ borderTop: '1px solid rgba(255,255,255,0.06)', padding: '20px 0', background: '#05070B', fontSize: '0.75rem', color: '#64748B' }}>
+      <footer style={{ borderTop: '1px solid var(--border)', padding: '16px 0', background: 'var(--surface)', fontSize: '0.75rem', color: 'var(--muted)' }}>
         <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-          <div>
-            Sentinel AI Governance Engine · Built for IBM Bob Autonomous Coding Agent Hackathon
-          </div>
+          <div>Sentinel AI Governance Engine · IBM Bob Hackathon</div>
           <div style={{ display: 'flex', gap: '16px' }}>
             <span>Backend: Python FastAPI</span>
             <span>Frontend: React 18</span>
-            <span>DB: PostgreSQL (Docker Dev / Neon Prod)</span>
+            <span>DB: PostgreSQL</span>
           </div>
         </div>
       </footer>

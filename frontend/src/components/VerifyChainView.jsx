@@ -1,81 +1,53 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  ShieldCheck, 
-  ShieldX, 
-  RefreshCw, 
-  AlertOctagon, 
-  Lock, 
-  Unlock, 
-  Flame, 
-  RotateCcw, 
-  CheckCircle2, 
-  XCircle, 
-  FileCode,
-  ArrowRight,
-  Sparkles
-} from 'lucide-react';
+import { RefreshCw, AlertOctagon, Flame, RotateCcw, CheckCircle2, XCircle } from 'lucide-react';
 import { api } from '../services/api';
 
+const card = {
+  background: 'var(--surface)',
+  border: '1px solid var(--border)',
+  borderRadius: '12px',
+  padding: '24px',
+};
+
 export default function VerifyChainView({ runs, selectedRunId, onSelectRun, onRefreshStats }) {
-  const [currentRunId, setCurrentRunId] = useState(selectedRunId || (runs[0]?.id || 'run-001'));
+  const [currentRunId, setCurrentRunId] = useState(selectedRunId || (runs[0]?.id || ''));
   const [verificationData, setVerificationData] = useState(null);
   const [runDetail, setRunDetail] = useState(null);
-  const [isVerifying, setIsVerifying] = useState(false);
-  const [isTampering, setIsTampering] = useState(false);
-  const [isRestoring, setIsRestoring] = useState(false);
+  const [isVerifying, setIsVerifying]   = useState(false);
+  const [isTampering, setIsTampering]   = useState(false);
+  const [isRestoring, setIsRestoring]   = useState(false);
   const [notification, setNotification] = useState(null);
 
-  useEffect(() => {
-    if (selectedRunId) {
-      setCurrentRunId(selectedRunId);
-    }
-  }, [selectedRunId]);
-
-  useEffect(() => {
-    if (currentRunId) {
-      runVerification(currentRunId);
-    }
-  }, [currentRunId]);
+  useEffect(() => { if (selectedRunId) setCurrentRunId(selectedRunId); }, [selectedRunId]);
+  useEffect(() => { if (currentRunId) runVerification(currentRunId); }, [currentRunId]);
 
   async function runVerification(runId) {
     setIsVerifying(true);
     try {
       const [verifRes, detailRes] = await Promise.all([
         api.verifyRun(runId),
-        api.getRunDetail(runId)
+        api.getRunDetail(runId),
       ]);
       setVerificationData(verifRes);
       setRunDetail(detailRes);
       onRefreshStats && onRefreshStats();
     } catch (err) {
-      console.error("Verification failed:", err);
+      console.error('Verification failed:', err);
     } finally {
       setIsVerifying(false);
     }
   }
 
   async function handleDemoTamper() {
-    if (!runDetail?.events || runDetail.events.length === 0) {
-      alert("No events available in this run to tamper.");
-      return;
-    }
-    // Pick event #2 or the first available event to tamper
-    const targetEvent = runDetail.events.length >= 2 ? runDetail.events[1] : runDetail.events[0];
-    
+    if (!runDetail?.events?.length) { alert('No events available to tamper.'); return; }
+    const target = runDetail.events.length >= 2 ? runDetail.events[1] : runDetail.events[0];
     setIsTampering(true);
     try {
-      const res = await api.injectTampering({
-        eventId: targetEvent.id,
-        maliciousTarget: "exfiltrate_credentials.sh"
-      });
-      setNotification({
-        type: 'danger',
-        message: `🚨 DEMO TAMPER INJECTED: Event #${targetEvent.id} target secretly mutated in PostgreSQL to 'exfiltrate_credentials.sh'! Re-verifying chain...`
-      });
-      // Re-run verification to immediately showcase cryptographic failure!
+      await api.injectTampering({ eventId: target.id, maliciousTarget: 'exfiltrate_credentials.sh' });
+      setNotification({ type: 'danger', message: `Demo tamper injected: Event #${target.id} mutated in DB. Re-verifying chain…` });
       await runVerification(currentRunId);
     } catch (err) {
-      alert(`Tamper injection error: ${err.message}`);
+      alert(`Tamper error: ${err.message}`);
     } finally {
       setIsTampering(false);
     }
@@ -85,10 +57,7 @@ export default function VerifyChainView({ runs, selectedRunId, onSelectRun, onRe
     setIsRestoring(true);
     try {
       const res = await api.restoreTampering({ runId: currentRunId });
-      setNotification({
-        type: 'success',
-        message: `✨ RESTORED: ${res.message} Re-verifying cryptographic chain...`
-      });
+      setNotification({ type: 'success', message: `Restored: ${res.message} Re-verifying…` });
       await runVerification(currentRunId);
     } catch (err) {
       alert(`Restore error: ${err.message}`);
@@ -97,56 +66,48 @@ export default function VerifyChainView({ runs, selectedRunId, onSelectRun, onRe
     }
   }
 
-  const events = runDetail?.events || [];
-  const isVerified = verificationData?.verified === true;
-  const isFailed = verificationData?.verified === false;
+  const events        = runDetail?.events     || [];
+  const isVerified    = verificationData?.verified === true;
+  const isFailed      = verificationData?.verified === false;
   const failedEventId = verificationData?.failed_event_id;
-  const auditList = verificationData?.events_audit || [];
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
-      
-      {/* Header & Hackathon Signature Callout */}
-      <div className="glass-panel" style={{ padding: '28px', border: isFailed ? '1px solid rgba(239, 68, 68, 0.4)' : '1px solid rgba(6, 182, 212, 0.3)' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+
+      {/* Header */}
+      <div style={{ ...card, borderColor: isFailed ? 'rgba(178,58,46,0.35)' : 'rgba(62,107,79,0.3)' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-              <span className="badge badge-verified" style={{ background: 'rgba(6,182,212,0.15)' }}>
-                Signature Hackathon Feature
-              </span>
-              <span style={{ fontSize: '0.8rem', color: '#64748B' }}>
-                Mathematical Proof of Tamper Resistance
-              </span>
+              <span className="badge badge-verified">Cryptographic Verification</span>
             </div>
-            <h1 style={{ fontSize: '1.6rem', fontWeight: '800', color: '#FFFFFF', letterSpacing: '-0.02em' }}>
-              Cryptographic Hash Chain Verification & Tamper Lab
+            <h1 style={{ fontSize: '1.4rem', fontWeight: 700, color: 'var(--ink)', marginBottom: '6px' }}>
+              Hash Chain Verification & Tamper Lab
             </h1>
-            <p style={{ color: '#94A3B8', fontSize: '0.88rem', maxWidth: '700px' }}>
-              Every event logged by IBM Bob is linked with SHA-256: <span className="font-mono" style={{ color: '#06B6D4' }}>H(n) = SHA256(H(n-1) + Payload)</span>.
-              Any unauthorized alteration in the PostgreSQL database breaks the sequence and is instantly detected.
+            <p style={{ color: 'var(--muted)', fontSize: '0.85rem', maxWidth: '680px' }}>
+              Every event logged by IBM Bob is linked with SHA-256:{' '}
+              <span className="mono" style={{ color: 'var(--accent)' }}>H(n) = SHA256(H(n-1) + Payload)</span>.{' '}
+              Any unauthorised alteration in the PostgreSQL database breaks the sequence and is instantly detected.
             </p>
           </div>
 
-          {/* Interactive Presentation Demo Controls */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
             <button
               onClick={() => runVerification(currentRunId)}
               disabled={isVerifying}
               className="btn btn-secondary"
-              style={{ padding: '10px 18px', fontSize: '0.85rem' }}
             >
-              <RefreshCw size={16} className={isVerifying ? 'animate-spin' : ''} />
-              <span>{isVerifying ? 'Verifying...' : 'Verify Chain'}</span>
+              <RefreshCw size={14} style={{ animation: isVerifying ? 'spin 0.8s linear infinite' : 'none' }} />
+              {isVerifying ? 'Verifying…' : 'Verify Chain'}
             </button>
 
             <button
               onClick={handleDemoTamper}
               disabled={isTampering}
               className="btn btn-tamper"
-              style={{ padding: '10px 18px', fontSize: '0.85rem' }}
             >
-              <Flame size={16} color="#F87171" />
-              <span>Demo Tampering (Mutate DB)</span>
+              <Flame size={14} />
+              Demo Tamper
             </button>
 
             {isFailed && (
@@ -154,67 +115,61 @@ export default function VerifyChainView({ runs, selectedRunId, onSelectRun, onRe
                 onClick={handleRestoreChain}
                 disabled={isRestoring}
                 className="btn btn-approve"
-                style={{ padding: '10px 18px', fontSize: '0.85rem' }}
               >
-                <RotateCcw size={16} />
-                <span>Restore Chain</span>
+                <RotateCcw size={14} />
+                Restore Chain
               </button>
             )}
           </div>
         </div>
 
-        {/* Live Notification Banner */}
+        {/* Notification banner */}
         {notification && (
           <div style={{
-            marginTop: '20px',
-            padding: '12px 18px',
-            borderRadius: '10px',
-            background: notification.type === 'danger' ? 'rgba(239,68,68,0.15)' : 'rgba(16,185,129,0.15)',
-            border: notification.type === 'danger' ? '1px solid rgba(239,68,68,0.4)' : '1px solid rgba(16,185,129,0.4)',
-            color: notification.type === 'danger' ? '#FCA5A5' : '#6EE7B7',
+            marginTop: '14px',
+            padding: '10px 14px',
+            borderRadius: '6px',
+            background: notification.type === 'danger' ? 'var(--danger-bg)' : 'var(--success-bg)',
+            border: `1px solid ${notification.type === 'danger' ? 'rgba(178,58,46,0.35)' : 'rgba(62,107,79,0.35)'}`,
+            color: notification.type === 'danger' ? 'var(--danger)' : 'var(--success)',
             fontSize: '0.85rem',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between'
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px',
           }}>
             <span>{notification.message}</span>
-            <button 
+            <button
               onClick={() => setNotification(null)}
-              style={{ background: 'transparent', border: 'none', color: 'inherit', cursor: 'pointer', fontWeight: 'bold' }}
+              style={{ background: 'transparent', border: 'none', color: 'inherit', cursor: 'pointer', fontWeight: 700, fontSize: '1rem', lineHeight: 1 }}
             >
-              ✕
+              ×
             </button>
           </div>
         )}
       </div>
 
-      {/* Selector & Big Integrity Status Card */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '20px' }}>
-        
-        {/* Run Selector */}
-        <div className="glass-panel" style={{ padding: '24px' }}>
-          <label style={{ fontSize: '0.78rem', color: '#94A3B8', fontWeight: '600', textTransform: 'uppercase', display: 'block', marginBottom: '8px' }}>
+      {/* Selector + result row */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '16px' }}>
+
+        {/* Run selector */}
+        <div style={card}>
+          <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.3px', marginBottom: '6px' }}>
             Audited Run ID
           </label>
           <select
             value={currentRunId}
-            onChange={(e) => {
-              setCurrentRunId(e.target.value);
-              onSelectRun && onSelectRun(e.target.value);
-            }}
+            onChange={e => { setCurrentRunId(e.target.value); onSelectRun && onSelectRun(e.target.value); }}
             style={{
               width: '100%',
-              background: '#0B0F19',
-              color: '#FFFFFF',
-              border: '1px solid rgba(255,255,255,0.15)',
-              borderRadius: '8px',
-              padding: '10px 16px',
-              fontSize: '0.95rem',
-              fontFamily: 'var(--font-mono)',
-              fontWeight: '600',
+              background: 'var(--bg)',
+              color: 'var(--ink)',
+              border: '1px solid var(--border)',
+              borderRadius: '6px',
+              padding: '8px 12px',
+              fontSize: '0.9rem',
+              fontFamily: 'var(--font-sans)',
+              fontWeight: 600,
               outline: 'none',
               cursor: 'pointer',
-              marginBottom: '16px'
+              marginBottom: '14px',
             }}
           >
             {runs.map(r => (
@@ -223,164 +178,144 @@ export default function VerifyChainView({ runs, selectedRunId, onSelectRun, onRe
               </option>
             ))}
           </select>
-
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', color: '#94A3B8' }}>
-            <span>Total Events: <strong style={{ color: '#FFFFFF' }}>{verificationData?.event_count || events.length}</strong></span>
-            <span>Algorithm: <strong className="font-mono" style={{ color: '#06B6D4' }}>SHA-256</strong></span>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: 'var(--muted)' }}>
+            <span>Events: <strong style={{ color: 'var(--ink)' }}>{verificationData?.event_count || events.length}</strong></span>
+            <span>Algorithm: <strong className="mono" style={{ color: 'var(--accent)' }}>SHA-256</strong></span>
           </div>
         </div>
 
-        {/* Verification Result Card */}
-        <div 
-          className="glass-panel" 
-          style={{ 
-            padding: '24px', 
-            background: isFailed ? 'rgba(239, 68, 68, 0.08)' : 'rgba(16, 185, 129, 0.08)',
-            border: isFailed ? '1px solid rgba(239, 68, 68, 0.4)' : '1px solid rgba(16, 185, 129, 0.3)'
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '14px' }}>
-            {isVerified ? (
-              <div style={{ width: '42px', height: '42px', borderRadius: '12px', background: 'rgba(16,185,129,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <CheckCircle2 color="#10B981" size={26} />
-              </div>
-            ) : (
-              <div style={{ width: '42px', height: '42px', borderRadius: '12px', background: 'rgba(239,68,68,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <XCircle color="#EF4444" size={26} />
-              </div>
-            )}
-
+        {/* Verification result */}
+        <div style={{
+          ...card,
+          background: isFailed ? 'rgba(178,58,46,0.04)' : 'rgba(62,107,79,0.04)',
+          borderColor: isFailed ? 'rgba(178,58,46,0.35)' : 'rgba(62,107,79,0.3)',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '14px' }}>
+            <div style={{
+              width: '40px', height: '40px', borderRadius: '10px', flexShrink: 0,
+              background: isFailed ? 'var(--danger-bg)' : 'var(--success-bg)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              {isVerified
+                ? <CheckCircle2 size={22} color="var(--success)" />
+                : <XCircle      size={22} color="var(--danger)" />}
+            </div>
             <div>
-              <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', fontWeight: '700', color: isVerified ? '#34D399' : '#F87171' }}>
-                Verification Audit Verdict
+              <div style={{ fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.3px', color: isFailed ? 'var(--danger)' : 'var(--success)', marginBottom: '2px' }}>
+                Verification Verdict
               </div>
-              <div style={{ fontSize: '1.25rem', fontWeight: '800', color: '#FFFFFF' }}>
-                {isVerified ? '🔒 CHAIN VERIFIED — ALL EVENTS VALID' : '❌ VERIFICATION FAILED — TAMPER DETECTED'}
+              <div style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--ink)' }}>
+                {isVerified ? 'Chain Verified — All Events Valid' : 'Verification Failed — Tamper Detected'}
               </div>
             </div>
           </div>
 
-          {/* Hash Chain Progress Bar */}
-          <div style={{ marginBottom: '12px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', marginBottom: '6px' }}>
-              <span style={{ color: '#94A3B8' }}>Hash Chain Integrity</span>
-              <span style={{ fontWeight: '700', color: isVerified ? '#10B981' : '#EF4444' }}>
-                {isVerified ? '100% SECURE' : 'COMPROMISED'}
+          {/* Integrity bar */}
+          <div style={{ marginBottom: '10px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', marginBottom: '6px', color: 'var(--muted)' }}>
+              <span>Hash Chain Integrity</span>
+              <span style={{ fontWeight: 700, color: isFailed ? 'var(--danger)' : 'var(--success)' }}>
+                {isVerified ? '100% Secure' : 'Compromised'}
               </span>
             </div>
-            <div style={{ width: '100%', height: '8px', background: 'rgba(255,255,255,0.1)', borderRadius: '4px', overflow: 'hidden' }}>
+            <div style={{ width: '100%', height: '6px', background: 'var(--border)', borderRadius: '3px', overflow: 'hidden' }}>
               <div style={{
                 width: isVerified ? '100%' : '35%',
                 height: '100%',
-                background: isVerified ? 'linear-gradient(90deg, #10B981, #06B6D4)' : '#EF4444',
-                transition: 'all 0.4s ease'
+                background: isVerified ? 'var(--success)' : 'var(--danger)',
+                transition: 'width 0.4s ease',
               }} />
             </div>
           </div>
 
-          <div style={{ fontSize: '0.8rem', color: isVerified ? '#94A3B8' : '#FCA5A5' }}>
-            {isVerified ? (
-              <span>✓ Event integrity verified · ✓ No modification detected</span>
-            ) : (
-              <span>⚠️ Event #{failedEventId} modified in database without matching cryptographic hash!</span>
-            )}
+          <div style={{ fontSize: '0.78rem', color: isFailed ? 'var(--danger)' : 'var(--muted)' }}>
+            {isVerified
+              ? '✓ No modification detected · ✓ Event integrity valid'
+              : `Event #${failedEventId} modified in database without matching cryptographic hash.`}
           </div>
         </div>
-
       </div>
 
-      {/* Discrepancy Breakdown if Failed */}
+      {/* Discrepancy breakdown */}
       {isFailed && verificationData && (
-        <div className="glass-panel" style={{ padding: '24px', border: '1px solid rgba(239, 68, 68, 0.4)', background: '#0F121C' }}>
-          <h3 style={{ fontSize: '1.05rem', fontWeight: '800', color: '#F87171', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <AlertOctagon size={18} />
-            <span>Cryptographic Discrepancy Analysis (Event #{failedEventId})</span>
+        <div style={{ ...card, borderColor: 'rgba(178,58,46,0.35)', background: 'rgba(178,58,46,0.03)' }}>
+          <h3 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--danger)', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <AlertOctagon size={16} />
+            Cryptographic Discrepancy — Event #{failedEventId}
           </h3>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '16px' }}>
-            <div style={{ background: '#07090E', padding: '14px', borderRadius: '8px', border: '1px solid rgba(16,185,129,0.3)' }}>
-              <div style={{ fontSize: '0.72rem', color: '#10B981', fontWeight: '700', textTransform: 'uppercase' }}>Expected Recomputed Hash</div>
-              <div className="font-mono" style={{ fontSize: '0.75rem', color: '#34D399', wordBreak: 'break-all', marginTop: '4px' }}>
-                {verificationData.expected_hash}
-              </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '12px' }}>
+            <div style={{ background: 'var(--bg)', padding: '12px', borderRadius: '6px', border: '1px solid rgba(62,107,79,0.3)' }}>
+              <div style={{ fontSize: '0.68rem', fontWeight: 700, color: 'var(--success)', textTransform: 'uppercase', marginBottom: '4px' }}>Expected (Recomputed)</div>
+              <div className="mono" style={{ fontSize: '0.75rem', color: 'var(--success)', wordBreak: 'break-all' }}>{verificationData.expected_hash}</div>
             </div>
-
-            <div style={{ background: '#07090E', padding: '14px', borderRadius: '8px', border: '1px solid rgba(239,68,68,0.4)' }}>
-              <div style={{ fontSize: '0.72rem', color: '#EF4444', fontWeight: '700', textTransform: 'uppercase' }}>Database Received Hash</div>
-              <div className="font-mono" style={{ fontSize: '0.75rem', color: '#F87171', wordBreak: 'break-all', marginTop: '4px' }}>
-                {verificationData.actual_hash}
-              </div>
+            <div style={{ background: 'var(--bg)', padding: '12px', borderRadius: '6px', border: '1px solid rgba(178,58,46,0.35)' }}>
+              <div style={{ fontSize: '0.68rem', fontWeight: 700, color: 'var(--danger)', textTransform: 'uppercase', marginBottom: '4px' }}>Stored in Database</div>
+              <div className="mono" style={{ fontSize: '0.75rem', color: 'var(--danger)', wordBreak: 'break-all' }}>{verificationData.actual_hash}</div>
             </div>
           </div>
         </div>
       )}
 
-      {/* Visual Chain Nodes (Genesis -> Event 1 -> Event 2 ...) */}
-      <div className="glass-panel" style={{ padding: '28px' }}>
-        <h3 style={{ fontSize: '1.15rem', fontWeight: '700', color: '#FFFFFF', marginBottom: '6px' }}>
-          Cryptographic Event Blocks & Links
+      {/* Event chain blocks */}
+      <div style={card}>
+        <h3 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--ink)', marginBottom: '4px' }}>
+          Cryptographic Event Blocks
         </h3>
-        <p style={{ fontSize: '0.8rem', color: '#64748B', marginBottom: '24px' }}>
-          Visual block succession showing genesis root hash linking sequentially to the current tip.
+        <p style={{ fontSize: '0.78rem', color: 'var(--muted)', marginBottom: '20px' }}>
+          Visual block succession from genesis root hash to the current chain tip.
         </p>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
           {events.map((ev, idx) => {
             const isCorrupted = isFailed && ev.id === failedEventId;
 
             return (
-              <div 
+              <div
                 key={ev.id}
-                className={`hash-node ${isCorrupted ? 'corrupted' : ''}`}
                 style={{
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
                   flexWrap: 'wrap',
-                  gap: '14px'
+                  gap: '12px',
+                  padding: '12px 14px',
+                  borderRadius: '8px',
+                  background: isCorrupted ? 'rgba(178,58,46,0.05)' : 'var(--bg)',
+                  border: `1px solid ${isCorrupted ? 'rgba(178,58,46,0.35)' : 'var(--border)'}`,
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                   <div style={{
-                    width: '32px',
-                    height: '32px',
-                    borderRadius: '8px',
-                    background: isCorrupted ? 'rgba(239,68,68,0.2)' : 'rgba(6,182,212,0.15)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontWeight: '700',
-                    fontSize: '0.8rem',
-                    color: isCorrupted ? '#EF4444' : '#06B6D4'
+                    width: '30px', height: '30px', borderRadius: '6px', flexShrink: 0,
+                    background: isCorrupted ? 'var(--danger-bg)' : 'var(--success-bg)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: '0.8rem', fontWeight: 700,
+                    color: isCorrupted ? 'var(--danger)' : 'var(--success)',
                   }}>
                     {isCorrupted ? '✕' : '✓'}
                   </div>
 
                   <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span className="font-mono" style={{ fontSize: '0.88rem', fontWeight: '700', color: '#FFFFFF' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2px' }}>
+                      <span className="mono" style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--ink)' }}>
                         Event {String(idx + 1).padStart(2, '0')}
                       </span>
-                      <span style={{ fontSize: '0.82rem', color: '#94A3B8' }}>
-                        {ev.action} <span style={{ color: '#06B6D4' }}>{ev.target}</span>
+                      <span style={{ fontSize: '0.8rem', color: 'var(--muted)' }}>
+                        {ev.action} <span style={{ color: 'var(--accent)' }}>{ev.target}</span>
                       </span>
                     </div>
-
-                    <div className="font-mono" style={{ fontSize: '0.68rem', color: '#64748B', display: 'flex', gap: '16px', marginTop: '4px' }}>
-                      <span>Prev: {ev.previous_hash.slice(0, 16)}...</span>
-                      <span>Hash: {ev.event_hash.slice(0, 16)}...</span>
+                    <div className="mono" style={{ fontSize: '0.68rem', color: 'var(--muted)', display: 'flex', gap: '16px' }}>
+                      <span>Prev: {ev.previous_hash.slice(0, 16)}…</span>
+                      <span>Hash: {ev.event_hash.slice(0, 16)}…</span>
                     </div>
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  {isCorrupted ? (
-                    <span className="badge badge-high">MUTATION DETECTED</span>
-                  ) : (
-                    <span className="badge badge-low">CRYPTOGRAPHICALLY VALID</span>
-                  )}
+                <div>
+                  {isCorrupted
+                    ? <span className="badge badge-tampered">Mutation Detected</span>
+                    : <span className="badge badge-verified">Cryptographically Valid</span>}
                 </div>
-
               </div>
             );
           })}
