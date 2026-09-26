@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models import Event, Run
 from app.schemas import TamperRequest, TamperResponse, RestoreRequest
+from app.routers.verify import perform_run_verification
 
 router = APIRouter(prefix="/api/tamper", tags=["Hackathon Demo — Tamper Lab"])
 
@@ -37,6 +38,9 @@ def inject_tampering(payload: TamperRequest, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(event)
 
+    # Immediately record the verification failure so chain_status reflects reality
+    perform_run_verification(event.run_id, db)
+
     return TamperResponse(
         success=True,
         message=f"Event #{event.id} maliciously altered in database (target changed from '{original_target}' to '{event.target}'). Cryptographic hash remained untouched.",
@@ -58,6 +62,7 @@ def restore_event(payload: RestoreRequest, db: Session = Depends(get_db)):
 
     events = query.all()
     restored_count = 0
+    affected_run_ids = set()
 
     for ev in events:
         meta = dict(ev.metadata_json or {})
@@ -68,9 +73,15 @@ def restore_event(payload: RestoreRequest, db: Session = Depends(get_db)):
             meta.pop("__original_target", None)
             meta.pop("__original_action", None)
             ev.metadata_json = meta
+            affected_run_ids.add(ev.run_id)
             restored_count += 1
 
     db.commit()
+
+    # Re-verify every restored run so a fresh verified=True row is written immediately
+    for run_id in affected_run_ids:
+        perform_run_verification(run_id, db)
+
     return {
         "success": True,
         "restored_count": restored_count,

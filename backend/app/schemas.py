@@ -110,5 +110,7 @@ class DashboardStats(BaseModel):
     total_events: int
     risky_actions: int
     pending_approvals: int
-    chain_status: str  # VERIFIED, COMPROMISED, PENDING
+    chain_status: str  # VERIFIED, COMPROMISED
+    latest_run_id: Optional[str] = None
+    compromised_runs_count: int = 0
     recent_events: List[EventSchema]

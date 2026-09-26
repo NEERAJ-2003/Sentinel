@@ -45,7 +45,7 @@ export default function VerifyChainView({ runs, selectedRunId, onSelectRun, onRe
       setVerificationData(verifRes);
       setRunDetail(detailRes);
       if (manualRef.current && verifRes?.verified) setVerifiedDone(true);
-      onRefreshStats && onRefreshStats();
+      if (onRefreshStats) setTimeout(onRefreshStats, 950);
     } catch (err) {
       console.error('Verification failed:', err);
     } finally {
@@ -140,20 +140,29 @@ export default function VerifyChainView({ runs, selectedRunId, onSelectRun, onRe
                 </span>
               </span>
 
-              {/* Text slot — both labels share the same grid cell, crossfade after icon */}
+              {/* Text slot — all three labels share the same grid cell, crossfade */}
               <span style={{ display: 'grid' }}>
                 <span style={{
                   gridArea: '1/1', whiteSpace: 'nowrap',
-                  opacity: verifiedDone ? 0 : 1,
-                  transition: 'opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.5s',
+                  opacity: (!isVerifying && !verifiedDone) ? 1 : 0,
+                  transition: 'opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+                  pointerEvents: 'none',
                 }}>
-                  {isVerifying ? 'Verifying…' : 'Verify Chain'}
+                  Verify Chain
+                </span>
+                <span style={{
+                  gridArea: '1/1', whiteSpace: 'nowrap',
+                  opacity: (isVerifying && !verifiedDone) ? 1 : 0,
+                  transition: 'opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+                  pointerEvents: 'none',
+                }}>
+                  Verifying…
                 </span>
                 <span style={{
                   gridArea: '1/1', whiteSpace: 'nowrap',
                   color: 'var(--success)',
                   opacity: verifiedDone ? 1 : 0,
-                  transition: 'opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.5s',
+                  transition: 'opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
                   pointerEvents: 'none',
                 }}>
                   Verified

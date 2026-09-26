@@ -46,12 +46,14 @@ function StatCard({ label, value, subtext, icon, accent, onClick, clickable }) {
 }
 
 export default function DashboardView({ stats, runs, onSelectRun, onNavigate, onRunSimulation, isSimulating }) {
-  const activeRuns      = stats?.active_runs      || 0;
-  const totalEvents     = stats?.total_events     || 0;
-  const riskyActions    = stats?.risky_actions    || 0;
+  const activeRuns       = stats?.active_runs       || 0;
+  const totalEvents      = stats?.total_events      || 0;
+  const riskyActions     = stats?.risky_actions     || 0;
   const pendingApprovals = stats?.pending_approvals || 0;
-  const chainStatus     = stats?.chain_status     || 'VERIFIED';
-  const recentEvents    = stats?.recent_events    || [];
+  const chainStatus      = stats?.chain_status      || 'VERIFIED';
+  const latestRunId      = stats?.latest_run_id;
+  const compromisedCount = stats?.compromised_runs_count || 0;
+  const recentEvents     = stats?.recent_events     || [];
 
   const verified = chainStatus === 'VERIFIED';
 
@@ -84,7 +86,7 @@ export default function DashboardView({ stats, runs, onSelectRun, onNavigate, on
               ? <CheckCircle2 size={16} color="var(--success)" />
               : <XCircle     size={16} color="var(--danger)" />}
             <span style={{ fontSize: '0.8rem', fontWeight: 600, color: verified ? 'var(--success)' : 'var(--danger)' }}>
-              {verified ? 'Chain Verified' : 'Tamper Detected'}
+              {verified ? 'Latest Run: Verified' : 'Latest Run: Tamper Detected'}
             </span>
           </div>
 

@@ -2,6 +2,7 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from sqlalchemy import func
+from sqlalchemy import and_
 from app.database import get_db
 from app.models import Run, Event, Approval, VerificationResult
 from app.schemas import RunSummarySchema, RunDetailSchema, EventSchema, DashboardStats
@@ -25,13 +26,41 @@ def get_dashboard_stats(db: Session = Depends(get_db)):
         .scalar() or 0
     )
 
-    # Check overall chain status across runs
+    # Total count of runs with unresolved tampering in history
+    latest_per_run = (
+        db.query(
+            VerificationResult.run_id,
+            func.max(VerificationResult.id).label("max_id")
+        )
+        .group_by(VerificationResult.run_id)
+        .subquery()
+    )
     failed_verifications = (
         db.query(func.count(VerificationResult.id))
+        .join(latest_per_run, and_(
+            VerificationResult.run_id == latest_per_run.c.run_id,
+            VerificationResult.id == latest_per_run.c.max_id
+        ))
         .filter(VerificationResult.verified == False)
         .scalar() or 0
     )
-    chain_status = "COMPROMISED" if failed_verifications > 0 else "VERIFIED"
+
+    # Option 1: Base primary chain_status on the LATEST / ACTIVE run
+    latest_run = db.query(Run).order_by(Run.started_at.desc()).first()
+    latest_run_id = latest_run.id if latest_run else None
+    latest_run_compromised = False
+
+    if latest_run:
+        latest_run_verif = (
+            db.query(VerificationResult)
+            .filter(VerificationResult.run_id == latest_run.id)
+            .order_by(VerificationResult.id.desc())
+            .first()
+        )
+        if latest_run_verif and latest_run_verif.verified is False:
+            latest_run_compromised = True
+
+    chain_status = "COMPROMISED" if latest_run_compromised else "VERIFIED"
 
     # Recent 10 events
     recent_events = (
@@ -47,6 +76,8 @@ def get_dashboard_stats(db: Session = Depends(get_db)):
         risky_actions=risky_actions,
         pending_approvals=pending_approvals,
         chain_status=chain_status,
+        latest_run_id=latest_run_id,
+        compromised_runs_count=failed_verifications,
         recent_events=recent_events
     )
 
