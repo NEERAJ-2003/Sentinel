@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { RefreshCw, AlertOctagon, Flame, RotateCcw, CheckCircle2, XCircle } from 'lucide-react';
 import { api } from '../services/api';
 import CustomSelect from './CustomSelect';
@@ -18,6 +18,8 @@ export default function VerifyChainView({ runs, selectedRunId, onSelectRun, onRe
   const [isTampering, setIsTampering]   = useState(false);
   const [isRestoring, setIsRestoring]   = useState(false);
   const [notification, setNotification] = useState(null);
+  const [barWidth, setBarWidth] = useState(0);
+  const barRafRef = useRef(null);
 
   useEffect(() => { if (selectedRunId) setCurrentRunId(selectedRunId); }, [selectedRunId]);
   useEffect(() => { if (currentRunId) runVerification(currentRunId); }, [currentRunId]);
@@ -29,6 +31,13 @@ export default function VerifyChainView({ runs, selectedRunId, onSelectRun, onRe
         api.verifyRun(runId),
         api.getRunDetail(runId),
       ]);
+      setBarWidth(0);
+      // Let the browser paint the 0% bar first, then animate to target
+      barRafRef.current = requestAnimationFrame(() => {
+        barRafRef.current = requestAnimationFrame(() => {
+          setBarWidth(verifRes?.verified ? 100 : 35);
+        });
+      });
       setVerificationData(verifRes);
       setRunDetail(detailRes);
       onRefreshStats && onRefreshStats();
@@ -38,6 +47,9 @@ export default function VerifyChainView({ runs, selectedRunId, onSelectRun, onRe
       setIsVerifying(false);
     }
   }
+
+  // Clean up any pending rAF on unmount
+  useEffect(() => () => { if (barRafRef.current) cancelAnimationFrame(barRafRef.current); }, []);
 
   async function handleDemoTamper() {
     if (!runDetail?.events?.length) { alert('No events available to tamper.'); return; }
@@ -205,10 +217,11 @@ export default function VerifyChainView({ runs, selectedRunId, onSelectRun, onRe
             </div>
             <div style={{ width: '100%', height: '6px', background: 'var(--border)', borderRadius: '3px', overflow: 'hidden' }}>
               <div style={{
-                width: isVerified ? '100%' : '35%',
+                width: `${barWidth}%`,
                 height: '100%',
                 background: isVerified ? 'var(--success)' : 'var(--danger)',
-                transition: 'width 0.4s ease',
+                transition: 'width 0.9s cubic-bezier(0.4, 0, 0.2, 1)',
+                willChange: 'width',
               }} />
             </div>
           </div>

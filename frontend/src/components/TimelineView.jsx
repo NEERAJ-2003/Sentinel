@@ -67,7 +67,7 @@ export default function TimelineView({ runs, selectedRunId, onSelectRun, onNavig
           </div>
 
           {runInfo && (
-            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center', alignSelf: 'flex-end', marginBottom: '2px' }}>
               <span className={`badge ${runInfo.status === 'active' ? 'badge-high' : 'badge-verified'}`}>
                 {runInfo.status}
               </span>

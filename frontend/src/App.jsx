@@ -106,7 +106,7 @@ export default function App() {
               </div>
             </div>
           ) : (
-            <React.Fragment key={currentTab}>
+            <div key={currentTab} className="view-enter">
               {currentTab === 'dashboard' && (
                 <DashboardView
                   stats={stats}
@@ -143,7 +143,7 @@ export default function App() {
                   onRefreshStats={loadStatsAndPending}
                 />
               )}
-            </React.Fragment>
+            </div>
           )}
 
         </div>
@@ -153,11 +153,7 @@ export default function App() {
       <footer style={{ borderTop: '1px solid var(--border)', padding: '16px 0', background: 'var(--surface)', fontSize: '0.75rem', color: 'var(--muted)' }}>
         <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
           <div>Sentinel AI Governance Engine · IBM Bob Hackathon</div>
-          <div style={{ display: 'flex', gap: '16px' }}>
-            <span>Backend: Python FastAPI</span>
-            <span>Frontend: React 18</span>
-            <span>DB: PostgreSQL</span>
-          </div>
+          <div>Created by @hyperlane</div>
         </div>
       </footer>
 

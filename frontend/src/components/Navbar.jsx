@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { ShieldCheck, Activity, Clock, AlertTriangle, Play, Lock } from 'lucide-react';
 
 export default function Navbar({ currentTab, setCurrentTab, stats, onRunSimulation, isSimulating }) {
@@ -11,6 +11,26 @@ export default function Navbar({ currentTab, setCurrentTab, stats, onRunSimulati
     { id: 'approvals',  label: 'Approval Queue',     Icon: AlertTriangle, badge: pendingCount },
     { id: 'verify',     label: 'Verify Chain',        Icon: Lock, alert: isCompromised },
   ];
+
+  const navRef = useRef(null);
+  const buttonRefs = useRef({});
+  const [indicator, setIndicator] = useState({ left: 0, width: 0, ready: false });
+
+  // Update the indicator position whenever the active tab changes
+  useEffect(() => {
+    const activeBtn = buttonRefs.current[currentTab];
+    const nav = navRef.current;
+    if (!activeBtn || !nav) return;
+
+    const navRect = nav.getBoundingClientRect();
+    const btnRect = activeBtn.getBoundingClientRect();
+
+    setIndicator({
+      left: btnRect.left - navRect.left,
+      width: btnRect.width,
+      ready: true,
+    });
+  }, [currentTab]);
 
   return (
     <header style={{
@@ -31,12 +51,33 @@ export default function Navbar({ currentTab, setCurrentTab, stats, onRunSimulati
         </div>
 
         {/* Nav tabs */}
-        <nav style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+        <nav ref={navRef} style={{ display: 'flex', alignItems: 'center', gap: '4px', position: 'relative' }}>
+
+          {/* Sliding active indicator */}
+          {indicator.ready && (
+            <span
+              style={{
+                position: 'absolute',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                left: indicator.left,
+                width: indicator.width,
+                height: '34px',
+                background: 'var(--bg)',
+                borderRadius: '6px',
+                transition: 'left 0.28s cubic-bezier(0.4, 0, 0.2, 1), width 0.28s cubic-bezier(0.4, 0, 0.2, 1)',
+                pointerEvents: 'none',
+                zIndex: 0,
+              }}
+            />
+          )}
+
           {NAV.map(({ id, label, Icon, badge, alert }) => {
             const active = currentTab === id;
             return (
               <button
                 key={id}
+                ref={el => { buttonRefs.current[id] = el; }}
                 onClick={() => setCurrentTab(id)}
                 style={{
                   display: 'flex',
@@ -46,13 +87,14 @@ export default function Navbar({ currentTab, setCurrentTab, stats, onRunSimulati
                   fontSize: '0.82rem',
                   fontWeight: active ? 600 : 400,
                   fontFamily: 'var(--font-sans)',
-                  background: active ? 'var(--bg)' : 'transparent',
+                  background: 'transparent',
                   color: active ? 'var(--ink)' : 'rgba(242,242,240,0.7)',
                   border: 'none',
                   borderRadius: '6px',
                   cursor: 'pointer',
-                  transition: 'background 0.15s ease, color 0.15s ease',
+                  transition: 'color 0.2s ease',
                   position: 'relative',
+                  zIndex: 1,
                 }}
                 onMouseEnter={e => { if (!active) e.currentTarget.style.color = 'var(--bg)'; }}
                 onMouseLeave={e => { if (!active) e.currentTarget.style.color = 'rgba(242,242,240,0.7)'; }}
