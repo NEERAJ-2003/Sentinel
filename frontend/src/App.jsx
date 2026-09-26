@@ -95,7 +95,7 @@ export default function App() {
       />
 
       {/* Main Content Area */}
-      <main style={{ flex: 1, padding: '32px 0 16px' }}>
+      <main style={{ flex: 1, padding: '32px 0 16px', overflowY: 'auto', scrollBehavior: 'smooth', WebkitOverflowScrolling: 'touch', overscrollBehavior: 'contain', willChange: 'scroll-position' }}>
         <div className="container">
           
           {loading && !stats ? (

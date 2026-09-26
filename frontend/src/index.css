@@ -28,6 +28,10 @@
   padding: 0;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   background-color: var(--bg);
   color: var(--ink);
@@ -39,11 +43,19 @@ body {
   overflow: hidden;
 }
 
-/* Scrollbar */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: var(--bg); }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #c8c4be; }
+/* Scrollbar — slim overlay style for smooth feel */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: rgba(16, 16, 16, 0.18);
+  border-radius: 99px;
+  transition: background 0.2s ease;
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(16, 16, 16, 0.35); }
+::-webkit-scrollbar-corner { background: transparent; }
+
+/* Firefox smooth scrolling */
+* { scrollbar-width: thin; scrollbar-color: rgba(16,16,16,0.18) transparent; }
 
 /* ─── Layout ─────────────────────────────────────────────── */
 .container {
