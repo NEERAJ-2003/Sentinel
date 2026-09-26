@@ -359,40 +359,68 @@ button, input, select, textarea {
 }
 
 /* ─── Comet-sweep border animation on stat cards ────────────────
-   Uses @property so the browser can interpolate --angle smoothly
-   (avoids the snap-at-360 that plain custom properties cause).
-   Each card gets its own --angle-* property so they all stay in
-   sync (same @keyframes, same duration, started together).       */
+   Uses @property so the browser can interpolate --angle smoothly.
+   Perimeter-linearized keyframes: Because the card is a rectangle
+   (~280px × 130px), a constant angular rotation causes the linear speed
+   along edges to scale with sec²(θ). Near the corners, sec²(65°) ≈ 5.64,
+   which normally makes the beam whip over 5× faster!
+   The keyframes below invert this projection (θ = arctan(s/d)) so the
+   beam travels at an EXACT, UNIFORM linear speed across all edges and corners. */
 
-@property --angle-green  { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
-@property --angle-blue   { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
-@property --angle-red    { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
-@property --angle-yellow { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
-
-@keyframes comet-spin-green  { to { --angle-green:  360deg; } }
-@keyframes comet-spin-blue   { to { --angle-blue:   360deg; } }
-@keyframes comet-spin-red    { to { --angle-red:    360deg; } }
-@keyframes comet-spin-yellow { to { --angle-yellow: 360deg; } }
-
-/* Shared wrapper — positions the pseudo-element that carries the
-   conic-gradient behind the card without altering the card size. */
-.comet-card-wrap {
-  position: relative;
-  border-radius: 12px;  /* must match S.card borderRadius */
+@property --angle-comet {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: true;
 }
 
-/* The glowing ring lives entirely in ::before.
-   We give it a 2 px "bleed" on all sides so the card hides its
-   interior perfectly, leaving only the ring visible. */
+@keyframes comet-spin-uniform {
+  0.0%  { --angle-comet: 0.0deg; }    /* Top edge center */
+  4.3%  { --angle-comet: 28.3deg; }
+  8.5%  { --angle-comet: 47.1deg; }
+  12.8% { --angle-comet: 58.2deg; }
+  17.1% { --angle-comet: 65.1deg; }   /* Top-right corner (slow angle rate = constant linear speed) */
+  21.0% { --angle-comet: 76.9deg; }
+  25.0% { --angle-comet: 90.0deg; }   /* Right edge center */
+  29.0% { --angle-comet: 103.1deg; }
+  32.9% { --angle-comet: 114.9deg; }  /* Bottom-right corner */
+  37.2% { --angle-comet: 121.8deg; }
+  41.5% { --angle-comet: 132.9deg; }
+  45.7% { --angle-comet: 151.7deg; }
+  50.0% { --angle-comet: 180.0deg; }  /* Bottom edge center */
+  54.3% { --angle-comet: 208.3deg; }
+  58.5% { --angle-comet: 227.1deg; }
+  62.8% { --angle-comet: 238.2deg; }
+  67.1% { --angle-comet: 245.1deg; }  /* Bottom-left corner */
+  71.0% { --angle-comet: 256.9deg; }
+  75.0% { --angle-comet: 270.0deg; }  /* Left edge center */
+  79.0% { --angle-comet: 283.1deg; }
+  82.9% { --angle-comet: 294.9deg; }  /* Top-left corner */
+  87.2% { --angle-comet: 301.8deg; }
+  91.5% { --angle-comet: 312.9deg; }
+  95.7% { --angle-comet: 331.7deg; }
+  100%  { --angle-comet: 360.0deg; }  /* Top edge center */
+}
+
+/* Shared wrapper — creates isolated stacking context so the glowing
+   border overlays cleanly on top of the card's native border. */
+.comet-card-wrap {
+  position: relative;
+  border-radius: 12px;
+  isolation: isolate;
+}
+
+/* The glowing beam sits in ::before directly ABOVE the card's border (z-index: 2).
+   Inset: -1px with 2px padding centers the beam right over the 1px card border. */
 .comet-card-wrap::before {
   content: '';
   position: absolute;
-  inset: -2px;
-  border-radius: 14px;   /* 12 + 2 */
-  padding: 2px;          /* ring thickness */
-  /* background is set per colour variant below */
+  inset: -1px;
+  border-radius: 13px;
+  padding: 2px;
+  z-index: 2;
+  animation: comet-spin-uniform 18s linear infinite;
 
-  /* Mask: show only the padding ring, not the inner fill */
+  /* Mask: keep only the 2px border stroke, masking out the inner card */
   -webkit-mask:
     linear-gradient(#fff 0 0) content-box,
     linear-gradient(#fff 0 0);
@@ -406,66 +434,50 @@ button, input, select, textarea {
   will-change: background;
 }
 
-/* ── Green (Active Runs) ── */
-.comet-card-wrap.comet-green {
-  animation: comet-spin-green 3s linear infinite;
-}
+/* ── Green (Active Runs) — Deep Emerald ── */
 .comet-card-wrap.comet-green::before {
   background: conic-gradient(
-    from var(--angle-green),
+    from var(--angle-comet, 0deg),
     transparent 0deg,
-    transparent 200deg,
-    rgba(34,197,94,0.15)  240deg,
-    rgba(34,197,94,0.55)  290deg,
-    rgba(34,197,94,1)     360deg
+    transparent 310deg,
+    rgba(16,100,48,0.25)  330deg,
+    rgba(16,100,48,0.75)  352deg,
+    rgba(16,100,48,1)     360deg
   );
-  animation: comet-spin-green 3s linear infinite;
 }
 
-/* ── Blue (Total Events) ── */
-.comet-card-wrap.comet-blue {
-  animation: comet-spin-blue 3s linear infinite;
-}
+/* ── Blue (Total Events) — Deep Royal Blue ── */
 .comet-card-wrap.comet-blue::before {
   background: conic-gradient(
-    from var(--angle-blue),
+    from var(--angle-comet, 0deg),
     transparent 0deg,
-    transparent 200deg,
-    rgba(59,130,246,0.15)  240deg,
-    rgba(59,130,246,0.55)  290deg,
-    rgba(59,130,246,1)     360deg
+    transparent 310deg,
+    rgba(20,60,175,0.25)  330deg,
+    rgba(20,60,175,0.75)  352deg,
+    rgba(20,60,175,1)     360deg
   );
-  animation: comet-spin-blue 3s linear infinite;
 }
 
-/* ── Red (Risky Actions) ── */
-.comet-card-wrap.comet-red {
-  animation: comet-spin-red 3s linear infinite;
-}
+/* ── Red (Risky Actions) — Deep Crimson Red ── */
 .comet-card-wrap.comet-red::before {
   background: conic-gradient(
-    from var(--angle-red),
+    from var(--angle-comet, 0deg),
     transparent 0deg,
-    transparent 200deg,
-    rgba(239,68,68,0.15)  240deg,
-    rgba(239,68,68,0.55)  290deg,
-    rgba(239,68,68,1)     360deg
+    transparent 310deg,
+    rgba(165,26,26,0.25)  330deg,
+    rgba(165,26,26,0.75)  352deg,
+    rgba(165,26,26,1)     360deg
   );
-  animation: comet-spin-red 3s linear infinite;
 }
 
-/* ── Yellow (Pending Approvals) ── */
-.comet-card-wrap.comet-yellow {
-  animation: comet-spin-yellow 3s linear infinite;
-}
+/* ── Yellow (Pending Approvals) — Deep Amber ── */
 .comet-card-wrap.comet-yellow::before {
   background: conic-gradient(
-    from var(--angle-yellow),
+    from var(--angle-comet, 0deg),
     transparent 0deg,
-    transparent 200deg,
-    rgba(234,179,8,0.15)  240deg,
-    rgba(234,179,8,0.55)  290deg,
-    rgba(234,179,8,1)     360deg
+    transparent 310deg,
+    rgba(175,90,5,0.25)  330deg,
+    rgba(175,90,5,0.75)  352deg,
+    rgba(175,90,5,1)     360deg
   );
-  animation: comet-spin-yellow 3s linear infinite;
 }

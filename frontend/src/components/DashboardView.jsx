@@ -115,40 +115,40 @@ export default function DashboardView({
           label="Active Runs"
           value={activeRuns}
           subtext={`${runs.length} total recorded agent sessions`}
-          accent="34,197,94"
-          icon={<Clock size={17} color="rgb(34,197,94)" />}
+          accent="16,100,48"
+          icon={<Clock size={17} color="rgb(16,100,48)" />}
           cometClass="comet-green"
-          numColor="rgb(34,197,94)"
+          numColor="rgb(16,100,48)"
         />
 
         <StatCard
           label="Total Events"
           value={totalEvents}
           subtext="SHA-256 hashed & chained in Postgres"
-          accent="59,130,246"
-          icon={<Database size={17} color="rgb(59,130,246)" />}
+          accent="20,60,175"
+          icon={<Database size={17} color="rgb(20,60,175)" />}
           cometClass="comet-blue"
-          numColor="rgb(59,130,246)"
+          numColor="rgb(20,60,175)"
         />
 
         <StatCard
           label="Risky Actions"
           value={riskyActions}
           subtext="Flagged by deterministic policy engine"
-          accent="239,68,68"
-          icon={<Flame size={17} color="rgb(239,68,68)" />}
+          accent="165,26,26"
+          icon={<Flame size={17} color="rgb(165,26,26)" />}
           cometClass="comet-red"
-          numColor="rgb(239,68,68)"
+          numColor="rgb(165,26,26)"
         />
 
         <StatCard
           label="Pending Approvals"
           value={pendingApprovals}
           subtext={pendingApprovals > 0 ? 'Action required in Approval Queue →' : 'Zero tasks paused'}
-          accent="234,179,8"
-          icon={<ShieldAlert size={17} color="rgb(234,179,8)" />}
+          accent="175,90,5"
+          icon={<ShieldAlert size={17} color="rgb(175,90,5)" />}
           cometClass="comet-yellow"
-          numColor="rgb(234,179,8)"
+          numColor="rgb(175,90,5)"
           clickable={pendingApprovals > 0}
           onClick={() => pendingApprovals > 0 && onNavigate('approvals')}
         />
