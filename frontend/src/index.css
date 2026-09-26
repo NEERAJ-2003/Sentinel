@@ -357,3 +357,115 @@ button, input, select, textarea {
   animation: tab-fade-slide 0.38s cubic-bezier(0.25, 1, 0.35, 1) both;
   will-change: opacity, transform;
 }
+
+/* ─── Comet-sweep border animation on stat cards ────────────────
+   Uses @property so the browser can interpolate --angle smoothly
+   (avoids the snap-at-360 that plain custom properties cause).
+   Each card gets its own --angle-* property so they all stay in
+   sync (same @keyframes, same duration, started together).       */
+
+@property --angle-green  { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+@property --angle-blue   { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+@property --angle-red    { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+@property --angle-yellow { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+
+@keyframes comet-spin-green  { to { --angle-green:  360deg; } }
+@keyframes comet-spin-blue   { to { --angle-blue:   360deg; } }
+@keyframes comet-spin-red    { to { --angle-red:    360deg; } }
+@keyframes comet-spin-yellow { to { --angle-yellow: 360deg; } }
+
+/* Shared wrapper — positions the pseudo-element that carries the
+   conic-gradient behind the card without altering the card size. */
+.comet-card-wrap {
+  position: relative;
+  border-radius: 12px;  /* must match S.card borderRadius */
+}
+
+/* The glowing ring lives entirely in ::before.
+   We give it a 2 px "bleed" on all sides so the card hides its
+   interior perfectly, leaving only the ring visible. */
+.comet-card-wrap::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 14px;   /* 12 + 2 */
+  padding: 2px;          /* ring thickness */
+  /* background is set per colour variant below */
+
+  /* Mask: show only the padding ring, not the inner fill */
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+
+  pointer-events: none;
+  will-change: background;
+}
+
+/* ── Green (Active Runs) ── */
+.comet-card-wrap.comet-green {
+  animation: comet-spin-green 3s linear infinite;
+}
+.comet-card-wrap.comet-green::before {
+  background: conic-gradient(
+    from var(--angle-green),
+    transparent 0deg,
+    transparent 200deg,
+    rgba(34,197,94,0.15)  240deg,
+    rgba(34,197,94,0.55)  290deg,
+    rgba(34,197,94,1)     360deg
+  );
+  animation: comet-spin-green 3s linear infinite;
+}
+
+/* ── Blue (Total Events) ── */
+.comet-card-wrap.comet-blue {
+  animation: comet-spin-blue 3s linear infinite;
+}
+.comet-card-wrap.comet-blue::before {
+  background: conic-gradient(
+    from var(--angle-blue),
+    transparent 0deg,
+    transparent 200deg,
+    rgba(59,130,246,0.15)  240deg,
+    rgba(59,130,246,0.55)  290deg,
+    rgba(59,130,246,1)     360deg
+  );
+  animation: comet-spin-blue 3s linear infinite;
+}
+
+/* ── Red (Risky Actions) ── */
+.comet-card-wrap.comet-red {
+  animation: comet-spin-red 3s linear infinite;
+}
+.comet-card-wrap.comet-red::before {
+  background: conic-gradient(
+    from var(--angle-red),
+    transparent 0deg,
+    transparent 200deg,
+    rgba(239,68,68,0.15)  240deg,
+    rgba(239,68,68,0.55)  290deg,
+    rgba(239,68,68,1)     360deg
+  );
+  animation: comet-spin-red 3s linear infinite;
+}
+
+/* ── Yellow (Pending Approvals) ── */
+.comet-card-wrap.comet-yellow {
+  animation: comet-spin-yellow 3s linear infinite;
+}
+.comet-card-wrap.comet-yellow::before {
+  background: conic-gradient(
+    from var(--angle-yellow),
+    transparent 0deg,
+    transparent 200deg,
+    rgba(234,179,8,0.15)  240deg,
+    rgba(234,179,8,0.55)  290deg,
+    rgba(234,179,8,1)     360deg
+  );
+  animation: comet-spin-yellow 3s linear infinite;
+}

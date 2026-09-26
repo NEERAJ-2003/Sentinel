@@ -27,20 +27,19 @@ const S = {
   }),
 };
 
-function StatCard({ label, value, subtext, icon, accent, onClick, clickable }) {
+function StatCard({ label, value, subtext, icon, accent, onClick, clickable, cometClass, numColor }) {
   return (
-    <div
-      style={{ ...S.card, cursor: clickable ? 'pointer' : 'default' }}
-      onClick={onClick}
-    >
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
-        <span style={S.statLabel}>{label}</span>
-        <div style={S.iconBox(`rgba(${accent},0.12)`)}>
-          {icon}
+    <div className={`comet-card-wrap ${cometClass}`} onClick={onClick} style={{ cursor: clickable ? 'pointer' : 'default' }}>
+      <div style={{ ...S.card, border: '1px solid var(--border)', position: 'relative', zIndex: 0 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
+          <span style={S.statLabel}>{label}</span>
+          <div style={S.iconBox(`rgba(${accent},0.12)`)}>
+            {icon}
+          </div>
         </div>
+        <div style={{ ...S.statNum, color: numColor }}>{value}</div>
+        <div style={S.sub}>{subtext}</div>
       </div>
-      <div style={{ ...S.statNum, color: clickable && value > 0 ? 'var(--accent)' : 'var(--ink)' }}>{value}</div>
-      <div style={S.sub}>{subtext}</div>
     </div>
   );
 }
@@ -116,32 +115,40 @@ export default function DashboardView({
           label="Active Runs"
           value={activeRuns}
           subtext={`${runs.length} total recorded agent sessions`}
-          accent="16,16,16"
-          icon={<Clock size={17} color="var(--ink)" />}
+          accent="34,197,94"
+          icon={<Clock size={17} color="rgb(34,197,94)" />}
+          cometClass="comet-green"
+          numColor="rgb(34,197,94)"
         />
 
         <StatCard
           label="Total Events"
           value={totalEvents}
           subtext="SHA-256 hashed & chained in Postgres"
-          accent="16,16,16"
-          icon={<Database size={17} color="var(--ink)" />}
+          accent="59,130,246"
+          icon={<Database size={17} color="rgb(59,130,246)" />}
+          cometClass="comet-blue"
+          numColor="rgb(59,130,246)"
         />
 
         <StatCard
           label="Risky Actions"
           value={riskyActions}
           subtext="Flagged by deterministic policy engine"
-          accent="232,163,61"
-          icon={<Flame size={17} color="var(--accent)" />}
+          accent="239,68,68"
+          icon={<Flame size={17} color="rgb(239,68,68)" />}
+          cometClass="comet-red"
+          numColor="rgb(239,68,68)"
         />
 
         <StatCard
           label="Pending Approvals"
           value={pendingApprovals}
           subtext={pendingApprovals > 0 ? 'Action required in Approval Queue →' : 'Zero tasks paused'}
-          accent="232,163,61"
-          icon={<ShieldAlert size={17} color="var(--accent)" />}
+          accent="234,179,8"
+          icon={<ShieldAlert size={17} color="rgb(234,179,8)" />}
+          cometClass="comet-yellow"
+          numColor="rgb(234,179,8)"
           clickable={pendingApprovals > 0}
           onClick={() => pendingApprovals > 0 && onNavigate('approvals')}
         />
