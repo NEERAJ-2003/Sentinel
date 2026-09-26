@@ -57,6 +57,10 @@ body {
 /* Firefox smooth scrolling */
 * { scrollbar-width: thin; scrollbar-color: rgba(16,16,16,0.18) transparent; }
 
+/* Hide scrollbar visually while keeping scroll functional */
+.no-scrollbar { scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+
 /* ─── Layout ─────────────────────────────────────────────── */
 .container {
   max-width: 1320px;
