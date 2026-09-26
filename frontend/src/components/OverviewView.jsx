@@ -83,9 +83,6 @@ export default function OverviewView({ onNavigate, onRunSimulation, isSimulating
               <span className="badge badge-verified" style={{ padding: '3px 8px', fontSize: '0.68rem' }}>
                 Active Governance Engine
               </span>
-              <span style={{ fontSize: '0.78rem', color: 'var(--muted)', fontWeight: 500 }}>
-                Built for IBM Bob Autonomous Coding Hackathon
-              </span>
             </div>
 
             <h1 style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--ink)', letterSpacing: '-0.02em', lineHeight: 1.25, marginBottom: '12px' }}>
