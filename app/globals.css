@@ -1,0 +1,183 @@
+/* ── Reset ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  background: #0d1117;
+  color: #e6edf3;
+  min-height: 100vh;
+}
+
+/* ── Nav ── */
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  height: 52px;
+  background: #161b22;
+  border-bottom: 1px solid #30363d;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.nav-brand {
+  font-weight: 700;
+  font-size: 16px;
+  color: #58a6ff;
+  text-decoration: none;
+  letter-spacing: 0.5px;
+}
+
+.nav-links { display: flex; gap: 20px; }
+.nav-links a { color: #8b949e; text-decoration: none; font-size: 13px; }
+.nav-links a:hover { color: #e6edf3; }
+
+/* ── Layout ── */
+.main { max-width: 960px; margin: 0 auto; padding: 32px 24px; }
+
+/* ── Stat cards ── */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 32px;
+}
+
+.stat-card {
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  padding: 16px 20px;
+}
+
+.stat-card .label { font-size: 12px; color: #8b949e; text-transform: uppercase; letter-spacing: 0.6px; }
+.stat-card .value { font-size: 28px; font-weight: 700; color: #e6edf3; margin-top: 4px; }
+.stat-card .chain-ok  { font-size: 13px; color: #3fb950; margin-top: 4px; font-weight: 600; }
+.stat-card .chain-bad { font-size: 13px; color: #f85149; margin-top: 4px; font-weight: 600; }
+
+/* ── Section heading ── */
+h1 { font-size: 20px; font-weight: 700; margin-bottom: 20px; color: #e6edf3; }
+h2 { font-size: 16px; font-weight: 600; margin-bottom: 14px; color: #e6edf3; }
+
+/* ── Table ── */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th { text-align: left; padding: 8px 12px; border-bottom: 1px solid #30363d; color: #8b949e; font-weight: 500; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; }
+td { padding: 10px 12px; border-bottom: 1px solid #21262d; vertical-align: top; }
+tr:hover td { background: #161b22; }
+
+/* ── Risk badges ── */
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+.badge-low    { background: #1a3626; color: #3fb950; border: 1px solid #238636; }
+.badge-medium { background: #2d2208; color: #d29922; border: 1px solid #9e6a03; }
+.badge-high   { background: #2d1116; color: #f85149; border: 1px solid #da3633; }
+.badge-ok     { background: #1a3626; color: #3fb950; }
+.badge-fail   { background: #2d1116; color: #f85149; }
+.badge-pending{ background: #1a2340; color: #58a6ff; border: 1px solid #1f6feb; }
+
+/* ── Hash ── */
+.hash { font-family: "SF Mono", Consolas, monospace; font-size: 11px; color: #8b949e; }
+
+/* ── Cards / panels ── */
+.card {
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  padding: 20px 24px;
+  margin-bottom: 16px;
+}
+
+/* ── Chain link connector ── */
+.chain-row td:first-child { position: relative; }
+.chain-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+.chain-dot-ok   { background: #3fb950; }
+.chain-dot-fail { background: #f85149; }
+
+/* ── Verify banner ── */
+.verify-pass {
+  background: #1a3626;
+  border: 1px solid #238636;
+  border-radius: 8px;
+  padding: 16px 20px;
+  color: #3fb950;
+  font-weight: 600;
+  font-size: 15px;
+  margin-bottom: 20px;
+}
+.verify-fail {
+  background: #2d1116;
+  border: 1px solid #da3633;
+  border-radius: 8px;
+  padding: 16px 20px;
+  color: #f85149;
+  font-weight: 600;
+  font-size: 15px;
+  margin-bottom: 20px;
+}
+.verify-fail .detail { margin-top: 10px; font-size: 12px; font-weight: 400; color: #e6edf3; }
+.verify-fail .hash-line { font-family: "SF Mono", Consolas, monospace; font-size: 11px; color: #8b949e; }
+
+/* ── Buttons ── */
+.btn {
+  display: inline-block;
+  padding: 5px 14px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  margin-right: 6px;
+}
+.btn-approve { background: #238636; color: #fff; }
+.btn-approve:hover { background: #2ea043; }
+.btn-deny    { background: #da3633; color: #fff; }
+.btn-deny:hover    { background: #f85149; }
+.btn-verify  { background: #1f6feb; color: #fff; text-decoration: none; padding: 7px 16px; }
+.btn-verify:hover  { background: #388bfd; }
+
+/* ── Empty state ── */
+.empty { color: #8b949e; padding: 24px 0; text-align: center; font-size: 13px; }
+
+/* ── Run list ── */
+.run-list { display: flex; flex-direction: column; gap: 10px; }
+.run-item {
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  padding: 14px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  text-decoration: none;
+  color: inherit;
+}
+.run-item:hover { border-color: #58a6ff; }
+.run-item .run-id { font-family: "SF Mono", Consolas, monospace; font-size: 12px; color: #58a6ff; }
+.run-item .run-meta { font-size: 12px; color: #8b949e; }
+
+/* ── Progress bar ── */
+.progress-bg { background: #21262d; border-radius: 4px; height: 8px; margin: 10px 0; }
+.progress-fill { height: 8px; border-radius: 4px; background: #3fb950; }
+
+/* ── Approval row ── */
+.approval-action { font-weight: 600; color: #e6edf3; }
+.approval-meta   { font-size: 12px; color: #8b949e; margin-top: 2px; }

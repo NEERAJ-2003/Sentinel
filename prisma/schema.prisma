@@ -1,0 +1,54 @@
+// Sentinel — Prisma Schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Run {
+  id                  String               @id @default(cuid())
+  bob_task_id         String               @unique
+  started_at          DateTime             @default(now())
+  ended_at            DateTime?
+  status              String               @default("active")
+  events              Event[]
+  verification_results VerificationResult[]
+}
+
+model Event {
+  id            Int       @id @default(autoincrement())
+  run_id        String
+  event_type    String
+  action        String
+  target        String
+  metadata      Json?
+  timestamp     DateTime  @default(now())
+  previous_hash String
+  event_hash    String
+  risk_level    String
+  run           Run       @relation(fields: [run_id], references: [id])
+  approval      Approval?
+}
+
+model Approval {
+  id          Int      @id @default(autoincrement())
+  event_id    Int      @unique
+  decision    String
+  approved_by String
+  reason      String?
+  timestamp   DateTime @default(now())
+  event       Event    @relation(fields: [event_id], references: [id])
+}
+
+model VerificationResult {
+  id              Int      @id @default(autoincrement())
+  run_id          String
+  verified        Boolean
+  failed_event_id Int?
+  verified_at     DateTime @default(now())
+  run             Run      @relation(fields: [run_id], references: [id])
+}
