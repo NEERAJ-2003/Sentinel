@@ -1,5 +1,25 @@
-node_modules
-.next
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+env/
+.pytest_cache/
+
+# Node & Frontend
+node_modules/
+frontend/node_modules/
+frontend/dist/
+.next/
+.vercel/
+
+# Environment & Secrets
+.env
 .env.local
-.vercel
+*.env
+
+# Logs & OS
 *.log
+.DS_Store
+Thumbs.db

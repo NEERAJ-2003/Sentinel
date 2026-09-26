@@ -1,28 +1,13 @@
 {
   "name": "sentinel",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
+  "description": "Cryptographic Trust & Governance Layer for IBM Bob",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "simulate": "node bob-hook/sentinel-hook.mjs",
+    "frontend:dev": "npm run --prefix frontend dev",
+    "frontend:build": "npm run --prefix frontend build",
     "docker:up": "docker compose up -d",
     "docker:down": "docker compose down",
-    "prisma:migrate": "prisma migrate dev",
-    "prisma:studio": "prisma studio"
-  },
-  "dependencies": {
-    "@prisma/client": "^5.14.0",
-    "next": "^14.2.4",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
-  },
-  "devDependencies": {
-    "@types/node": "^20.14.0",
-    "@types/react": "^18.3.3",
-    "@types/react-dom": "^18.3.0",
-    "prisma": "^5.14.0",
-    "typescript": "^5.4.5"
+    "simulate": "python backend/simulate_bob.py"
   }
 }
