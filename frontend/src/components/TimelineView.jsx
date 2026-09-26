@@ -4,6 +4,7 @@ import {
   ShieldAlert, ChevronDown, ChevronUp, Lock, ArrowRight
 } from 'lucide-react';
 import { api } from '../services/api';
+import CustomSelect from './CustomSelect';
 
 const card = {
   background: 'var(--surface)',
@@ -49,37 +50,20 @@ export default function TimelineView({ runs, selectedRunId, onSelectRun, onNavig
   const runInfo = runDetail?.run;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+    <div className="view-enter" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
 
       {/* Controls bar */}
       <div style={{ ...card, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '14px', padding: '16px 24px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
           <div>
             <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.3px', marginBottom: '4px' }}>
-              Agent Run
-            </label>
-            <select
-              value={currentRunId}
-              onChange={e => { setCurrentRunId(e.target.value); onSelectRun && onSelectRun(e.target.value); }}
-              style={{
-                background: 'var(--bg)',
-                color: 'var(--ink)',
-                border: '1px solid var(--border)',
-                borderRadius: '6px',
-                padding: '6px 12px',
-                fontSize: '0.88rem',
-                fontFamily: 'var(--font-sans)',
-                fontWeight: 600,
-                outline: 'none',
-                cursor: 'pointer',
-              }}
-            >
-              {runs.map(r => (
-                <option key={r.id} value={r.id}>
-                  {r.id} ({r.bob_task_id}) — {r.event_count} events
-                </option>
-              ))}
-            </select>
+                Agent Run
+              </label>
+              <CustomSelect
+                value={currentRunId}
+                onChange={val => { setCurrentRunId(val); onSelectRun && onSelectRun(val); }}
+                options={runs.map(r => ({ value: r.id, label: `${r.id} (${r.bob_task_id}) — ${r.event_count} events` }))}
+              />
           </div>
 
           {runInfo && (
@@ -141,7 +125,13 @@ export default function TimelineView({ runs, selectedRunId, onSelectRun, onNavig
                 const isHigh  = ev.risk_level === 'HIGH';
 
                 return (
-                  <div key={ev.id} style={{ position: 'relative' }}>
+                  <div
+                    key={ev.id}
+                    style={{
+                      position: 'relative',
+                      animation: `fade-in 0.18s ease-out ${Math.min(idx * 0.04, 0.3)}s both`,
+                    }}
+                  >
                     {/* Node bullet */}
                     <div style={{
                       position: 'absolute',
@@ -218,7 +208,7 @@ export default function TimelineView({ runs, selectedRunId, onSelectRun, onNavig
 
                       {/* Expanded detail */}
                       {isExpanded && (
-                        <div style={{ marginTop: '12px', paddingTop: '12px', borderTop: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                        <div className="expand-enter" style={{ marginTop: '12px', paddingTop: '12px', borderTop: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '10px' }}>
                             <div style={{ background: 'var(--bg)', padding: '10px 12px', borderRadius: '6px', border: '1px solid var(--border)' }}>
                               <div style={{ fontSize: '0.68rem', fontWeight: 600, color: 'var(--muted)', textTransform: 'uppercase', marginBottom: '4px' }}>Previous Hash (H_{idx})</div>

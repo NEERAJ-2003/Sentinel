@@ -56,7 +56,7 @@ export default function DashboardView({ stats, runs, onSelectRun, onNavigate, on
   const verified = chainStatus === 'VERIFIED';
 
   return (
-    <div style={S.section}>
+    <div className="view-enter" style={S.section}>
 
       {/* ── Page header ────────────────────────────────────── */}
       <div style={{ ...S.row, marginBottom: '4px' }}>
@@ -217,13 +217,14 @@ export default function DashboardView({ stats, runs, onSelectRun, onNavigate, on
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             {recentEvents.length === 0
               ? <p style={S.sub}>No recent events.</p>
-              : recentEvents.slice(0, 6).map(ev => (
+              : recentEvents.slice(0, 6).map((ev, idx) => (
                 <div
                   key={ev.id}
                   style={{
                     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                     padding: '10px 12px', borderRadius: '8px',
                     background: 'var(--bg)', border: '1px solid var(--border)',
+                    animation: `fade-in 0.18s ease-out ${idx * 0.05}s both`,
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>

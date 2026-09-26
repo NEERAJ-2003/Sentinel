@@ -199,7 +199,10 @@ body {
 }
 
 /* ─── Loading spinner ─────────────────────────────────────── */
-@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
 .spinner {
   display: inline-block;
   width: 28px;
@@ -208,12 +211,19 @@ body {
   border-top-color: var(--ink);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
+  will-change: transform;
+}
+
+/* Reusable spinning class (for icon buttons, etc.) */
+.spin {
+  animation: spin 0.8s linear infinite;
+  will-change: transform;
 }
 
 /* ─── Subtle pulse for live indicator ───────────────────────── */
 @keyframes pulse-live {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0.45; }
+  0%, 100% { opacity: 1;    transform: scale(1); }
+  50%       { opacity: 0.5; transform: scale(0.85); }
 }
 .live-dot {
   display: inline-block;
@@ -222,4 +232,70 @@ body {
   border-radius: 50%;
   background: var(--success);
   animation: pulse-live 2s ease-in-out infinite;
+  will-change: opacity, transform;
+}
+
+/* ─── View entrance animation ────────────────────────────────── */
+@keyframes fade-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.view-enter {
+  animation: fade-slide-up 0.22s ease-out both;
+  will-change: opacity, transform;
+}
+
+/* ─── Collapsible expand animation ──────────────────────────── */
+@keyframes expand-down {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.expand-enter {
+  animation: expand-down 0.18s ease-out both;
+  will-change: opacity, transform;
+}
+
+/* ─── Card entrance (staggered list items) ───────────────────── */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.card-enter {
+  animation: fade-in 0.2s ease-out both;
+  will-change: opacity, transform;
+}
+
+/* ─── Custom animated dropdown ───────────────────────────────── */
+@keyframes dropdown-expand {
+  from {
+    opacity: 0;
+    transform: scaleY(0.85) translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: scaleY(1) translateY(0);
+  }
+}
+
+@keyframes dropdown-collapse {
+  from {
+    opacity: 1;
+    transform: scaleY(1) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: scaleY(0.85) translateY(-6px);
+  }
 }

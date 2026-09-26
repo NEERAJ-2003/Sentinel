@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { RefreshCw, AlertOctagon, Flame, RotateCcw, CheckCircle2, XCircle } from 'lucide-react';
 import { api } from '../services/api';
+import CustomSelect from './CustomSelect';
 
 const card = {
   background: 'var(--surface)',
@@ -72,7 +73,7 @@ export default function VerifyChainView({ runs, selectedRunId, onSelectRun, onRe
   const failedEventId = verificationData?.failed_event_id;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+    <div className="view-enter" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
 
       {/* Header */}
       <div style={{ ...card, borderColor: isFailed ? 'rgba(178,58,46,0.35)' : 'rgba(62,107,79,0.3)' }}>
@@ -97,7 +98,7 @@ export default function VerifyChainView({ runs, selectedRunId, onSelectRun, onRe
               disabled={isVerifying}
               className="btn btn-secondary"
             >
-              <RefreshCw size={14} style={{ animation: isVerifying ? 'spin 0.8s linear infinite' : 'none' }} />
+              <RefreshCw size={14} className={isVerifying ? 'spin' : ''} />
               {isVerifying ? 'Verifying…' : 'Verify Chain'}
             </button>
 
@@ -154,30 +155,14 @@ export default function VerifyChainView({ runs, selectedRunId, onSelectRun, onRe
           <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.3px', marginBottom: '6px' }}>
             Audited Run ID
           </label>
-          <select
-            value={currentRunId}
-            onChange={e => { setCurrentRunId(e.target.value); onSelectRun && onSelectRun(e.target.value); }}
-            style={{
-              width: '100%',
-              background: 'var(--bg)',
-              color: 'var(--ink)',
-              border: '1px solid var(--border)',
-              borderRadius: '6px',
-              padding: '8px 12px',
-              fontSize: '0.9rem',
-              fontFamily: 'var(--font-sans)',
-              fontWeight: 600,
-              outline: 'none',
-              cursor: 'pointer',
-              marginBottom: '14px',
-            }}
-          >
-            {runs.map(r => (
-              <option key={r.id} value={r.id}>
-                {r.id} ({r.bob_task_id})
-              </option>
-            ))}
-          </select>
+          <div style={{ marginBottom: '14px' }}>
+            <CustomSelect
+              value={currentRunId}
+              onChange={val => { setCurrentRunId(val); onSelectRun && onSelectRun(val); }}
+              options={runs.map(r => ({ value: r.id, label: `${r.id} (${r.bob_task_id})` }))}
+              style={{ fontSize: '0.9rem', padding: '8px 12px' }}
+            />
+          </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: 'var(--muted)' }}>
             <span>Events: <strong style={{ color: 'var(--ink)' }}>{verificationData?.event_count || events.length}</strong></span>
             <span>Algorithm: <strong className="mono" style={{ color: 'var(--accent)' }}>SHA-256</strong></span>

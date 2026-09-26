@@ -34,7 +34,7 @@ export default function ApprovalQueueView({ pendingApprovals, onRefresh, runs: _
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+    <div className="view-enter" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
 
       {/* Header */}
       <div style={{ ...card, borderColor: 'rgba(232,163,61,0.3)' }}>
@@ -131,13 +131,14 @@ export default function ApprovalQueueView({ pendingApprovals, onRefresh, runs: _
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-            {pendingApprovals.map(ev => (
+            {pendingApprovals.map((ev, idx) => (
               <div
                 key={ev.id}
                 style={{
                   ...card,
                   borderColor: 'rgba(232,163,61,0.35)',
                   background: 'rgba(232,163,61,0.03)',
+                  animation: `fade-in 0.2s ease-out ${idx * 0.06}s both`,
                 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px', marginBottom: '14px' }}>

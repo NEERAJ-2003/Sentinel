@@ -106,7 +106,7 @@ export default function App() {
               </div>
             </div>
           ) : (
-            <>
+            <React.Fragment key={currentTab}>
               {currentTab === 'dashboard' && (
                 <DashboardView
                   stats={stats}
@@ -143,7 +143,7 @@ export default function App() {
                   onRefreshStats={loadStatsAndPending}
                 />
               )}
-            </>
+            </React.Fragment>
           )}
 
         </div>
