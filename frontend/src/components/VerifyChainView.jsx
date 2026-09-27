@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { RefreshCw, Check, AlertOctagon, Flame, RotateCcw, CheckCircle2, XCircle } from 'lucide-react';
+import { RefreshCw, Check, AlertOctagon, Flame, RotateCcw, CheckCircle2, XCircle, Clock } from 'lucide-react';
 import { api } from '../services/api';
 import CustomSelect from './CustomSelect';
 
@@ -11,7 +11,8 @@ const card = {
 };
 
 export default function VerifyChainView({ runs, selectedRunId, onSelectRun, onRefreshStats }) {
-  const [currentRunId, setCurrentRunId] = useState(selectedRunId || (runs[0]?.id || ''));
+  const initialRunId = selectedRunId || (runs[0]?.id || '');
+  const [currentRunId, setCurrentRunId] = useState(initialRunId);
   const [verificationData, setVerificationData] = useState(null);
   const [runDetail, setRunDetail] = useState(null);
   const [isVerifying, setIsVerifying]   = useState(false);
@@ -21,15 +22,37 @@ export default function VerifyChainView({ runs, selectedRunId, onSelectRun, onRe
   const [notification, setNotification] = useState(null);
   const [barWidth, setBarWidth] = useState(0);
   const barRafRef   = useRef(null);
-  const manualRef   = useRef(false);
 
-  useEffect(() => { if (selectedRunId) setCurrentRunId(selectedRunId); }, [selectedRunId]);
-  useEffect(() => { if (currentRunId) runVerification(currentRunId); }, [currentRunId]);
+  useEffect(() => {
+    if (selectedRunId) setCurrentRunId(selectedRunId);
+  }, [selectedRunId]);
 
-  async function runVerification(runId, manual = false) {
+  useEffect(() => {
+    if (currentRunId) {
+      loadRunData(currentRunId);
+    }
+  }, [currentRunId]);
+
+  async function loadRunData(runId) {
+    try {
+      const detailRes = await api.getRunDetail(runId);
+      setRunDetail(detailRes);
+      if (detailRes?.verification) {
+        setVerificationData(detailRes.verification);
+        setVerifiedDone(detailRes.verification.verified === true);
+        setBarWidth(detailRes.verification.verified ? 100 : 35);
+      } else {
+        setVerificationData(null);
+        setVerifiedDone(false);
+        setBarWidth(0);
+      }
+    } catch (err) {
+      console.error('Failed to load run details:', err);
+    }
+  }
+
+  async function runVerification(runId) {
     setIsVerifying(true);
-    setVerifiedDone(false);
-    manualRef.current = manual;
     try {
       const [verifRes, detailRes] = await Promise.all([
         api.verifyRun(runId),
@@ -44,7 +67,7 @@ export default function VerifyChainView({ runs, selectedRunId, onSelectRun, onRe
       });
       setVerificationData(verifRes);
       setRunDetail(detailRes);
-      if (manualRef.current && verifRes?.verified) setVerifiedDone(true);
+      setVerifiedDone(verifRes?.verified === true);
       if (onRefreshStats) setTimeout(onRefreshStats, 950);
     } catch (err) {
       console.error('Verification failed:', err);
@@ -87,13 +110,14 @@ export default function VerifyChainView({ runs, selectedRunId, onSelectRun, onRe
   const events        = runDetail?.events     || [];
   const isVerified    = verificationData?.verified === true;
   const isFailed      = verificationData?.verified === false;
+  const isPending     = !verificationData;
   const failedEventId = verificationData?.failed_event_id;
 
   return (
     <div className="view-enter" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
 
       {/* Header */}
-      <div style={{ ...card, borderColor: isFailed ? 'rgba(178,58,46,0.35)' : 'rgba(62,107,79,0.3)' }}>
+      <div style={{ ...card, borderColor: isFailed ? 'rgba(178,58,46,0.35)' : isVerified ? 'rgba(62,107,79,0.3)' : 'rgba(232,163,61,0.3)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
@@ -111,11 +135,12 @@ export default function VerifyChainView({ runs, selectedRunId, onSelectRun, onRe
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap', overflow: 'hidden' }}>
             <button
-              onClick={() => runVerification(currentRunId, true)}
+              onClick={() => runVerification(currentRunId)}
               disabled={isVerifying}
               className="btn btn-secondary"
+              title={verifiedDone ? "Chain is verified. Click to re-verify." : isVerifying ? "Verifying cryptographic chain..." : "Click to manually verify cryptographic hash chain."}
               style={{
-                borderColor: verifiedDone ? 'var(--success)' : undefined,
+                borderColor: (verifiedDone && !isVerifying) ? 'var(--success)' : undefined,
                 transition: 'border-color 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
               }}
             >
@@ -125,7 +150,7 @@ export default function VerifyChainView({ runs, selectedRunId, onSelectRun, onRe
               }}>
                 <span style={{
                   gridArea: '1/1', display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                  opacity: verifiedDone ? 0 : 1,
+                  opacity: (verifiedDone && !isVerifying) ? 0 : 1,
                   transition: 'opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
                 }}>
                   <RefreshCw size={14} className={isVerifying ? 'spin' : ''} />
@@ -133,7 +158,7 @@ export default function VerifyChainView({ runs, selectedRunId, onSelectRun, onRe
                 <span style={{
                   gridArea: '1/1', display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
                   color: 'var(--success)',
-                  opacity: verifiedDone ? 1 : 0,
+                  opacity: (verifiedDone && !isVerifying) ? 1 : 0,
                   transition: 'opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
                 }}>
                   <Check size={14} />
@@ -152,7 +177,7 @@ export default function VerifyChainView({ runs, selectedRunId, onSelectRun, onRe
                 </span>
                 <span style={{
                   gridArea: '1/1', whiteSpace: 'nowrap',
-                  opacity: (isVerifying && !verifiedDone) ? 1 : 0,
+                  opacity: isVerifying ? 1 : 0,
                   transition: 'opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
                   pointerEvents: 'none',
                 }}>
@@ -161,7 +186,7 @@ export default function VerifyChainView({ runs, selectedRunId, onSelectRun, onRe
                 <span style={{
                   gridArea: '1/1', whiteSpace: 'nowrap',
                   color: 'var(--success)',
-                  opacity: verifiedDone ? 1 : 0,
+                  opacity: (verifiedDone && !isVerifying) ? 1 : 0,
                   transition: 'opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
                   pointerEvents: 'none',
                 }}>
@@ -248,25 +273,33 @@ export default function VerifyChainView({ runs, selectedRunId, onSelectRun, onRe
         {/* Verification result */}
         <div style={{
           ...card,
-          background: isFailed ? 'rgba(178,58,46,0.04)' : 'rgba(62,107,79,0.04)',
-          borderColor: isFailed ? 'rgba(178,58,46,0.35)' : 'rgba(62,107,79,0.3)',
+          background: isFailed ? 'rgba(178,58,46,0.04)' : isVerified ? 'rgba(62,107,79,0.04)' : 'rgba(232,163,61,0.04)',
+          borderColor: isFailed ? 'rgba(178,58,46,0.35)' : isVerified ? 'rgba(62,107,79,0.3)' : 'rgba(232,163,61,0.3)',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '14px' }}>
             <div style={{
               width: '40px', height: '40px', borderRadius: '10px', flexShrink: 0,
-              background: isFailed ? 'var(--danger-bg)' : 'var(--success-bg)',
+              background: isFailed ? 'var(--danger-bg)' : isVerified ? 'var(--success-bg)' : 'var(--accent-bg)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}>
-              {isVerified
-                ? <CheckCircle2 size={22} color="var(--success)" />
-                : <XCircle      size={22} color="var(--danger)" />}
+              {isFailed ? (
+                <XCircle size={22} color="var(--danger)" />
+              ) : isVerified ? (
+                <CheckCircle2 size={22} color="var(--success)" />
+              ) : (
+                <Clock size={22} color="var(--accent)" />
+              )}
             </div>
             <div>
-              <div style={{ fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.3px', color: isFailed ? 'var(--danger)' : 'var(--success)', marginBottom: '2px' }}>
+              <div style={{ fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.3px', color: isFailed ? 'var(--danger)' : isVerified ? 'var(--success)' : 'var(--accent)', marginBottom: '2px' }}>
                 Verification Verdict
               </div>
               <div style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--ink)' }}>
-                {isVerified ? 'Chain Verified — All Events Valid' : 'Verification Failed — Tamper Detected'}
+                {isFailed
+                  ? 'Verification Failed — Tamper Detected'
+                  : isVerified
+                  ? 'Chain Verified — All Events Valid'
+                  : 'Pending Audit — Awaiting Manual Verification'}
               </div>
             </div>
           </div>
@@ -275,25 +308,27 @@ export default function VerifyChainView({ runs, selectedRunId, onSelectRun, onRe
           <div style={{ marginBottom: '10px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', marginBottom: '6px', color: 'var(--muted)' }}>
               <span>Hash Chain Integrity</span>
-              <span style={{ fontWeight: 700, color: isFailed ? 'var(--danger)' : 'var(--success)' }}>
-                {isVerified ? '100% Secure' : 'Compromised'}
+              <span style={{ fontWeight: 700, color: isFailed ? 'var(--danger)' : isVerified ? 'var(--success)' : 'var(--accent)' }}>
+                {isFailed ? 'Compromised' : isVerified ? '100% Secure' : 'Pending Audit'}
               </span>
             </div>
             <div style={{ width: '100%', height: '6px', background: 'var(--border)', borderRadius: '3px', overflow: 'hidden' }}>
               <div style={{
                 width: `${barWidth}%`,
                 height: '100%',
-                background: isVerified ? 'var(--success)' : 'var(--danger)',
+                background: isFailed ? 'var(--danger)' : isVerified ? 'var(--success)' : 'var(--accent)',
                 transition: 'width 0.9s cubic-bezier(0.4, 0, 0.2, 1)',
                 willChange: 'width',
               }} />
             </div>
           </div>
 
-          <div style={{ fontSize: '0.78rem', color: isFailed ? 'var(--danger)' : 'var(--muted)' }}>
-            {isVerified
+          <div style={{ fontSize: '0.78rem', color: isFailed ? 'var(--danger)' : isVerified ? 'var(--muted)' : 'var(--accent)' }}>
+            {isFailed
+              ? `Event #${failedEventId} modified in database without matching cryptographic hash.`
+              : isVerified
               ? '✓ No modification detected · ✓ Event integrity valid'
-              : `Event #${failedEventId} modified in database without matching cryptographic hash.`}
+              : 'Audit session loaded. Click "Verify Chain" above to cryptographically audit this run.'}
           </div>
         </div>
       </div>
@@ -349,12 +384,20 @@ export default function VerifyChainView({ runs, selectedRunId, onSelectRun, onRe
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                   <div style={{
                     width: '30px', height: '30px', borderRadius: '6px', flexShrink: 0,
-                    background: isCorrupted ? 'var(--danger-bg)' : 'var(--success-bg)',
+                    background: isCorrupted
+                      ? 'var(--danger-bg)'
+                      : isVerified
+                      ? 'var(--success-bg)'
+                      : 'rgba(16,16,16,0.06)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     fontSize: '0.8rem', fontWeight: 700,
-                    color: isCorrupted ? 'var(--danger)' : 'var(--success)',
+                    color: isCorrupted
+                      ? 'var(--danger)'
+                      : isVerified
+                      ? 'var(--success)'
+                      : 'var(--muted)',
                   }}>
-                    {isCorrupted ? '✕' : '✓'}
+                    {isCorrupted ? '✕' : isVerified ? '✓' : idx + 1}
                   </div>
 
                   <div>
@@ -374,9 +417,13 @@ export default function VerifyChainView({ runs, selectedRunId, onSelectRun, onRe
                 </div>
 
                 <div>
-                  {isCorrupted
-                    ? <span className="badge badge-tampered">Mutation Detected</span>
-                    : <span className="badge badge-verified">Cryptographically Valid</span>}
+                  {isCorrupted ? (
+                    <span className="badge badge-tampered">Mutation Detected</span>
+                  ) : isVerified ? (
+                    <span className="badge badge-verified">Cryptographically Valid</span>
+                  ) : (
+                    <span className="badge badge-medium">Chained Event</span>
+                  )}
                 </div>
               </div>
             );
