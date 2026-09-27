@@ -12,7 +12,7 @@ const card = {
 export default function ApprovalQueueView({ pendingApprovals, onRefresh, runs: _runs }) {
   const [submittingId, setSubmittingId]             = useState(null);
   const [reviewerName, setReviewerName]             = useState('Lead Engineer');
-  const [actionSuccessMessage, setActionSuccessMessage] = useState(null);
+  const [actionFeedback, setActionFeedback] = useState(null); // { message, decision }
 
   async function handleDecision(eventId, decision) {
     setSubmittingId(eventId);
@@ -23,8 +23,8 @@ export default function ApprovalQueueView({ pendingApprovals, onRefresh, runs: _
         approvedBy: reviewerName || 'Security Operator',
         reason: `Human decision recorded: ${decision}`,
       });
-      setActionSuccessMessage(`Event #${eventId} marked as ${decision}.`);
-      setTimeout(() => setActionSuccessMessage(null), 4000);
+      setActionFeedback({ message: `Event #${eventId} marked as ${decision}.`, decision });
+      setTimeout(() => setActionFeedback(null), 4000);
       onRefresh && onRefresh();
     } catch (err) {
       alert(`Approval error: ${err.message}`);
@@ -58,19 +58,19 @@ export default function ApprovalQueueView({ pendingApprovals, onRefresh, runs: _
           </div>
         </div>
 
-        {actionSuccessMessage && (
+        {actionFeedback && (
           <div style={{
             marginTop: '14px',
             padding: '10px 14px',
             borderRadius: '6px',
-            background: 'var(--success-bg)',
-            border: '1px solid rgba(62,107,79,0.35)',
-            color: 'var(--success)',
+            background: actionFeedback.decision === 'DENIED' ? 'rgba(180,30,30,0.08)' : 'var(--success-bg)',
+            border: `1px solid ${actionFeedback.decision === 'DENIED' ? 'rgba(180,30,30,0.35)' : 'rgba(62,107,79,0.35)'}`,
+            color: actionFeedback.decision === 'DENIED' ? 'var(--danger)' : 'var(--success)',
             fontSize: '0.85rem',
             display: 'flex', alignItems: 'center', gap: '8px',
           }}>
-            <ShieldCheck size={16} />
-            {actionSuccessMessage}
+            {actionFeedback.decision === 'DENIED' ? <X size={16} /> : <ShieldCheck size={16} />}
+            {actionFeedback.message}
           </div>
         )}
       </div>
