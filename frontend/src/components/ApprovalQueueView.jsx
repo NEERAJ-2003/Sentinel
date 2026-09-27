@@ -12,7 +12,12 @@ const card = {
 export default function ApprovalQueueView({ pendingApprovals, onRefresh, runs: _runs }) {
   const [submittingId, setSubmittingId]             = useState(null);
   const [reviewerName, setReviewerName]             = useState('Lead Engineer');
-  const [actionFeedback, setActionFeedback] = useState(null); // { message, decision }
+  const [actionFeedback, setActionFeedback] = useState(null); // { message, decision, fading }
+
+  function dismissFeedback() {
+    setActionFeedback(prev => prev ? { ...prev, fading: true } : null);
+    setTimeout(() => setActionFeedback(null), 280); // matches toast-out duration
+  }
 
   async function handleDecision(eventId, decision) {
     setSubmittingId(eventId);
@@ -23,8 +28,8 @@ export default function ApprovalQueueView({ pendingApprovals, onRefresh, runs: _
         approvedBy: reviewerName || 'Security Operator',
         reason: `Human decision recorded: ${decision}`,
       });
-      setActionFeedback({ message: `Event #${eventId} marked as ${decision}.`, decision });
-      setTimeout(() => setActionFeedback(null), 4000);
+      setActionFeedback({ message: `Event #${eventId} marked as ${decision}.`, decision, fading: false });
+      setTimeout(() => dismissFeedback(), 4000);
       onRefresh && onRefresh();
     } catch (err) {
       alert(`Approval error: ${err.message}`);
@@ -59,16 +64,19 @@ export default function ApprovalQueueView({ pendingApprovals, onRefresh, runs: _
         </div>
 
         {actionFeedback && (
-          <div style={{
-            marginTop: '14px',
-            padding: '10px 14px',
-            borderRadius: '6px',
-            background: actionFeedback.decision === 'DENIED' ? 'rgba(180,30,30,0.08)' : 'var(--success-bg)',
-            border: `1px solid ${actionFeedback.decision === 'DENIED' ? 'rgba(180,30,30,0.35)' : 'rgba(62,107,79,0.35)'}`,
-            color: actionFeedback.decision === 'DENIED' ? 'var(--danger)' : 'var(--success)',
-            fontSize: '0.85rem',
-            display: 'flex', alignItems: 'center', gap: '8px',
-          }}>
+          <div
+            className={actionFeedback.fading ? 'toast-exit' : 'toast-enter'}
+            style={{
+              marginTop: '14px',
+              padding: '10px 14px',
+              borderRadius: '6px',
+              background: actionFeedback.decision === 'DENIED' ? 'var(--danger-bg)' : 'var(--success-bg)',
+              border: `1px solid ${actionFeedback.decision === 'DENIED' ? 'rgba(178,58,46,0.35)' : 'rgba(62,107,79,0.35)'}`,
+              color: actionFeedback.decision === 'DENIED' ? 'var(--danger)' : 'var(--success)',
+              fontSize: '0.85rem',
+              display: 'flex', alignItems: 'center', gap: '8px',
+            }}
+          >
             {actionFeedback.decision === 'DENIED' ? <X size={16} /> : <ShieldCheck size={16} />}
             {actionFeedback.message}
           </div>
@@ -120,7 +128,7 @@ export default function ApprovalQueueView({ pendingApprovals, onRefresh, runs: _
         </div>
 
         {pendingApprovals.length === 0 ? (
-          <div style={{ ...card, padding: '48px', textAlign: 'center' }}>
+          <div key="empty" className="empty-state-enter" style={{ ...card, padding: '48px', textAlign: 'center' }}>
             <ShieldCheck size={42} color="var(--success)" style={{ margin: '0 auto 14px', display: 'block' }} />
             <h3 style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--ink)', marginBottom: '6px' }}>
               No Pending Approvals
