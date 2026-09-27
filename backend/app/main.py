@@ -1,3 +1,4 @@
+import os
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -23,10 +24,15 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# Enable wide CORS for React frontend (Vite port 5173, Next port 3000, etc.)
+# Enable CORS — accept explicit origins from env, fall back to wildcard for local dev
+_raw_origins = os.getenv("ALLOWED_ORIGINS", "")
+_allowed_origins: list[str] = [o.strip() for o in _raw_origins.split(",") if o.strip()]
+if not _allowed_origins:
+    _allowed_origins = ["*"]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=_allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

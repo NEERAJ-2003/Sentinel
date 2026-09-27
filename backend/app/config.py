@@ -28,6 +28,12 @@ if "?schema=" in DATABASE_URL:
 elif "&schema=" in DATABASE_URL:
     DATABASE_URL = DATABASE_URL.replace("&schema=public", "")
 
+# Remove channel_binding parameter if present (not supported by all psycopg2/libpq builds)
+if "&channel_binding=" in DATABASE_URL:
+    DATABASE_URL = DATABASE_URL.split("&channel_binding=")[0]
+elif "?channel_binding=" in DATABASE_URL:
+    DATABASE_URL = DATABASE_URL.split("?channel_binding=")[0]
+
 # API Configuration
 API_PORT = int(os.getenv("PORT", "8000"))
 API_HOST = os.getenv("HOST", "0.0.0.0")
