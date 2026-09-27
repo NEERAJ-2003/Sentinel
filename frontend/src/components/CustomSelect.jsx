@@ -72,6 +72,9 @@ export default function CustomSelect({ value, onChange, options = [], style = {}
     justifyContent: 'space-between',
     gap: '8px',
     width: fixedWidth ? `${fixedWidth}px` : '100%',
+    maxWidth: '100%',
+    boxSizing: 'border-box',
+    minWidth: 0,
     background: 'var(--bg)',
     color: 'var(--ink)',
     border: '1px solid var(--border)',
@@ -99,6 +102,8 @@ export default function CustomSelect({ value, onChange, options = [], style = {}
     boxShadow: '0 8px 24px rgba(16,16,16,0.10)',
     maxHeight: '260px',
     overflowY: 'auto',
+    maxWidth: '100%',
+    boxSizing: 'border-box',
     animation: closing
       ? 'dropdown-collapse 0.16s ease-in both'
       : 'dropdown-expand 0.18s cubic-bezier(0.23, 1, 0.32, 1) both',
@@ -118,7 +123,16 @@ export default function CustomSelect({ value, onChange, options = [], style = {}
   };
 
   return (
-    <div ref={containerRef} style={{ position: 'relative', width: fixedWidth ? `${fixedWidth}px` : '100%' }}>
+    <div
+      ref={containerRef}
+      style={{
+        position: 'relative',
+        width: fixedWidth ? `${fixedWidth}px` : '100%',
+        maxWidth: '100%',
+        boxSizing: 'border-box',
+        minWidth: 0,
+      }}
+    >
       {/* Hidden sizer: renders every option to find the widest width */}
       <div
         ref={sizerRef}
@@ -142,7 +156,17 @@ export default function CustomSelect({ value, onChange, options = [], style = {}
       </div>
 
       <button type="button" onClick={handleToggle} style={triggerStyle}>
-        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        <span
+          title={selectedLabel}
+          style={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            flex: 1,
+            minWidth: 0,
+            textAlign: 'left',
+          }}
+        >
           {selectedLabel}
         </span>
         <ChevronDown
@@ -162,6 +186,7 @@ export default function CustomSelect({ value, onChange, options = [], style = {}
             <div
               key={opt.value}
               onClick={() => handleSelect(opt.value)}
+              title={opt.label}
               style={{
                 padding: '8px 14px',
                 fontSize: '0.88rem',
@@ -170,6 +195,9 @@ export default function CustomSelect({ value, onChange, options = [], style = {}
                 background: opt.value === value ? 'var(--ink)' : 'transparent',
                 cursor: 'pointer',
                 transition: 'background 0.1s ease',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
               }}
               onMouseEnter={e => {
                 if (opt.value !== value) e.currentTarget.style.background = 'rgba(16,16,16,0.05)';

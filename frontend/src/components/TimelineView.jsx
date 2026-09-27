@@ -53,9 +53,9 @@ export default function TimelineView({ runs, selectedRunId, onSelectRun, onNavig
     <div className="view-enter" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
 
       {/* Controls bar */}
-      <div style={{ ...card, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '14px', padding: '16px 24px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
-          <div>
+      <div style={{ ...card, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '14px', padding: '16px 24px', maxWidth: '100%', boxSizing: 'border-box' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap', maxWidth: '100%', minWidth: 0, flex: '1 1 auto' }}>
+          <div style={{ maxWidth: '100%', minWidth: 0 }}>
             <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.3px', marginBottom: '4px' }}>
                 Agent Run
               </label>
@@ -67,7 +67,7 @@ export default function TimelineView({ runs, selectedRunId, onSelectRun, onNavig
           </div>
 
           {runInfo && (
-            <div style={{ display: 'flex', gap: '8px', alignItems: 'center', alignSelf: 'flex-end', marginBottom: '2px' }}>
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center', alignSelf: 'flex-end', marginBottom: '2px', flexWrap: 'wrap' }}>
               <span className={`badge ${runInfo.status === 'active' ? 'badge-high' : 'badge-verified'}`}>
                 {runInfo.status}
               </span>
@@ -81,7 +81,7 @@ export default function TimelineView({ runs, selectedRunId, onSelectRun, onNavig
         <button
           onClick={() => onNavigate('verify')}
           className="btn btn-secondary"
-          style={{ fontSize: '0.82rem' }}
+          style={{ fontSize: '0.82rem', flexShrink: 0 }}
         >
           <Lock size={14} />
           Audit Chain
@@ -157,19 +157,20 @@ export default function TimelineView({ runs, selectedRunId, onSelectRun, onNavig
                       padding: '14px 16px',
                     }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                          <span className="mono" style={{ color: 'var(--muted)', fontSize: '0.78rem' }}>{timeStr}</span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0, maxWidth: '100%' }}>
+                          <span className="mono" style={{ color: 'var(--muted)', fontSize: '0.78rem', flexShrink: 0 }}>{timeStr}</span>
 
                           <div style={{
                             width: '26px', height: '26px', borderRadius: '6px',
                             background: 'rgba(16,16,16,0.06)',
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            flexShrink: 0,
                           }}>
                             {getEventIcon(ev.event_type, ev.risk_level)}
                           </div>
 
-                          <div>
-                            <div style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--ink)' }}>
+                          <div style={{ minWidth: 0 }}>
+                            <div style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--ink)', wordBreak: 'break-word' }}>
                               <span style={{ color: 'var(--accent)' }}>{ev.action}</span>
                               {' '}
                               <span className="mono">{ev.target}</span>
@@ -209,7 +210,7 @@ export default function TimelineView({ runs, selectedRunId, onSelectRun, onNavig
                       {/* Expanded detail */}
                       {isExpanded && (
                         <div className="expand-enter" style={{ marginTop: '12px', paddingTop: '12px', borderTop: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '10px' }}>
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 250px), 1fr))', gap: '10px' }}>
                             <div style={{ background: 'var(--bg)', padding: '10px 12px', borderRadius: '6px', border: '1px solid var(--border)' }}>
                               <div style={{ fontSize: '0.68rem', fontWeight: 600, color: 'var(--muted)', textTransform: 'uppercase', marginBottom: '4px' }}>Previous Hash (H_{idx})</div>
                               <div className="mono" style={{ color: 'var(--muted)', wordBreak: 'break-all', fontSize: '0.72rem' }}>{ev.previous_hash}</div>

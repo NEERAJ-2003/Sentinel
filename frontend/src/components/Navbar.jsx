@@ -1,9 +1,10 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { ShieldCheck, Activity, Clock, AlertTriangle, Play, Lock } from 'lucide-react';
+import { ShieldCheck, Activity, Clock, AlertTriangle, Play, Lock, Menu, X } from 'lucide-react';
 
 export default function Navbar({ currentTab, setCurrentTab, stats, onRunSimulation, isSimulating, onOpenArchitecture }) {
   const pendingCount = stats?.pending_approvals || 0;
   const isCompromised = stats?.chain_status === 'COMPROMISED';
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   const NAV = [
     { id: 'dashboard',  label: 'Dashboard',         Icon: Activity },
@@ -104,8 +105,8 @@ export default function Navbar({ currentTab, setCurrentTab, stats, onRunSimulati
           </span>
         </div>
 
-        {/* Nav tabs */}
-        <nav ref={navRef} style={{ display: 'flex', alignItems: 'center', gap: '4px', position: 'relative' }}>
+        {/* Nav tabs (Desktop) */}
+        <nav ref={navRef} className="desktop-nav" style={{ display: 'flex', alignItems: 'center', gap: '4px', position: 'relative' }}>
 
           {/* Sliding active indicator — vanishes smoothly when currentTab is 'overview' */}
           <span
@@ -188,8 +189,8 @@ export default function Navbar({ currentTab, setCurrentTab, stats, onRunSimulati
           })}
         </nav>
 
-        {/* Right-side controls */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
+        {/* Right-side controls (Desktop) */}
+        <div className="desktop-nav" style={{ display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
           {/* Live indicator */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <span className="live-dot" />
@@ -209,7 +210,139 @@ export default function Navbar({ currentTab, setCurrentTab, stats, onRunSimulati
           </button>
         </div>
 
+        {/* Mobile controls (Compact Simulate + Hamburger) */}
+        <div className="mobile-nav-toggle" style={{ display: 'none', alignItems: 'center', gap: '8px' }}>
+          <button
+            onClick={onRunSimulation}
+            disabled={isSimulating}
+            className="btn btn-primary"
+            title="Simulate Run"
+            style={{ fontSize: '0.75rem', padding: '6px 10px', background: 'var(--accent)', borderColor: 'var(--accent)', color: 'var(--ink)' }}
+          >
+            <Play size={12} />
+            {isSimulating ? '…' : 'Simulate'}
+          </button>
+
+          <button
+            onClick={() => setMobileOpen(prev => !prev)}
+            aria-label="Toggle Navigation"
+            style={{
+              background: 'rgba(255,255,255,0.08)',
+              border: '1px solid rgba(255,255,255,0.15)',
+              borderRadius: '6px',
+              padding: '6px 8px',
+              color: 'var(--bg)',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            {mobileOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
+        </div>
+
       </div>
+
+      {/* Mobile Drawer Menu */}
+      {mobileOpen && (
+        <div
+          className="view-enter"
+          style={{
+            padding: '10px 16px 16px',
+            borderTop: '1px solid rgba(255,255,255,0.08)',
+            background: 'var(--ink)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '6px',
+          }}
+        >
+          {NAV.map(({ id, label, Icon, badge, alert }) => {
+            const active = currentTab === id;
+            return (
+              <button
+                key={id}
+                onClick={() => {
+                  setCurrentTab(id);
+                  setMobileOpen(false);
+                }}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '10px 14px',
+                  borderRadius: '8px',
+                  fontSize: '0.9rem',
+                  fontWeight: active ? 600 : 400,
+                  color: active ? 'var(--ink)' : 'rgba(242,242,240,0.85)',
+                  background: active ? 'var(--bg)' : 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <Icon size={17} color={active ? 'var(--ink)' : 'var(--accent)'} />
+                  <span>{label}</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  {badge > 0 && (
+                    <span style={{
+                      background: 'var(--accent)',
+                      color: 'var(--ink)',
+                      fontSize: '0.65rem',
+                      fontWeight: 700,
+                      padding: '1px 7px',
+                      borderRadius: '9999px',
+                    }}>
+                      {badge}
+                    </span>
+                  )}
+                  {alert && (
+                    <span style={{
+                      background: 'var(--danger)',
+                      color: '#fff',
+                      fontSize: '0.6rem',
+                      fontWeight: 700,
+                      padding: '1px 6px',
+                      borderRadius: '9999px',
+                    }}>
+                      FAIL
+                    </span>
+                  )}
+                </div>
+              </button>
+            );
+          })}
+
+          <button
+            onClick={() => {
+              if (onOpenArchitecture) onOpenArchitecture();
+              else setCurrentTab('overview');
+              setMobileOpen(false);
+            }}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '10px 14px',
+              borderRadius: '8px',
+              fontSize: '0.9rem',
+              fontWeight: currentTab === 'overview' ? 600 : 400,
+              color: currentTab === 'overview' ? 'var(--ink)' : 'rgba(242,242,240,0.85)',
+              background: currentTab === 'overview' ? 'var(--accent)' : 'rgba(255,255,255,0.04)',
+              border: '1px solid rgba(232,163,61,0.3)',
+              cursor: 'pointer',
+              marginTop: '4px',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <ShieldCheck size={17} color={currentTab === 'overview' ? 'var(--ink)' : 'var(--accent)'} />
+              <span>System Architecture & Overview</span>
+            </div>
+          </button>
+        </div>
+      )}
     </header>
   );
 }

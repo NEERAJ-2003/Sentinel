@@ -109,7 +109,7 @@ export default function DashboardView({
       </div>
 
       {/* ── 4 KPI cards ────────────────────────────────────── */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
+      <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 220px), 1fr))', gap: '16px' }}>
 
         <StatCard
           label="Active Runs"
@@ -156,7 +156,7 @@ export default function DashboardView({
       </div>
 
       {/* ── Bottom grid: runs + live stream ────────────────── */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(420px, 1fr))', gap: '20px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 340px), 1fr))', gap: '20px' }}>
 
         {/* Recent runs */}
         <div style={S.card}>

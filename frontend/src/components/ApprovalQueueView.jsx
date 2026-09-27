@@ -151,7 +151,7 @@ export default function ApprovalQueueView({ pendingApprovals, onRefresh, runs: _
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px', marginBottom: '14px' }}>
 
-                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', minWidth: 0, maxWidth: '100%' }}>
                     <div style={{
                       width: '34px', height: '34px', flexShrink: 0,
                       borderRadius: '8px',
@@ -163,20 +163,20 @@ export default function ApprovalQueueView({ pendingApprovals, onRefresh, runs: _
                       <AlertTriangle size={18} color="var(--accent)" />
                     </div>
 
-                    <div>
+                    <div style={{ minWidth: 0 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '5px', flexWrap: 'wrap' }}>
                         <span className="badge badge-high">High Risk Action</span>
                         <span style={{ fontSize: '0.72rem', color: 'var(--muted)' }}>Event #{ev.id}</span>
                         <span className="mono" style={{ fontSize: '0.72rem', color: 'var(--muted)' }}>Run: {ev.run_id}</span>
                       </div>
 
-                      <div style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--ink)', marginBottom: '5px' }}>
+                      <div style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--ink)', marginBottom: '5px', wordBreak: 'break-word' }}>
                         Action: <span style={{ color: 'var(--danger)' }}>{ev.action}</span> {ev.target}
                       </div>
 
-                      <div style={{ fontSize: '0.82rem', color: 'var(--muted)', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <CornerDownRight size={13} color="var(--accent)" />
-                        Reason: <strong style={{ color: 'var(--ink)' }}>Destructive or sensitive operation detected by Policy Engine</strong>
+                      <div style={{ fontSize: '0.82rem', color: 'var(--muted)', display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                        <CornerDownRight size={13} color="var(--accent)" style={{ flexShrink: 0 }} />
+                        <span>Reason: <strong style={{ color: 'var(--ink)' }}>Destructive or sensitive operation detected by Policy Engine</strong></span>
                       </div>
                     </div>
                   </div>

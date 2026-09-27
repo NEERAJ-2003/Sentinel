@@ -249,14 +249,14 @@ export default function VerifyChainView({ runs, selectedRunId, onSelectRun, onRe
       </div>
 
       {/* Selector + result row */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '16px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '16px' }}>
 
         {/* Run selector */}
-        <div style={card}>
+        <div style={{ ...card, minWidth: 0, maxWidth: '100%', boxSizing: 'border-box' }}>
           <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.3px', marginBottom: '6px' }}>
             Audited Run ID
           </label>
-          <div style={{ marginBottom: '14px' }}>
+          <div style={{ marginBottom: '14px', maxWidth: '100%', minWidth: 0 }}>
             <CustomSelect
               value={currentRunId}
               onChange={val => { setCurrentRunId(val); onSelectRun && onSelectRun(val); }}
@@ -340,7 +340,7 @@ export default function VerifyChainView({ runs, selectedRunId, onSelectRun, onRe
             <AlertOctagon size={16} />
             Cryptographic Discrepancy — Event #{failedEventId}
           </h3>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '12px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '12px' }}>
             <div style={{ background: 'var(--bg)', padding: '12px', borderRadius: '6px', border: '1px solid rgba(62,107,79,0.3)' }}>
               <div style={{ fontSize: '0.68rem', fontWeight: 700, color: 'var(--success)', textTransform: 'uppercase', marginBottom: '4px' }}>Expected (Recomputed)</div>
               <div className="mono" style={{ fontSize: '0.75rem', color: 'var(--success)', wordBreak: 'break-all' }}>{verificationData.expected_hash}</div>

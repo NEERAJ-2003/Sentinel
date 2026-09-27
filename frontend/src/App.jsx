@@ -88,7 +88,7 @@ export default function App() {
   }
 
   return (
-    <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg)', overflow: 'hidden' }}>
+    <div style={{ minHeight: '100dvh', height: '100dvh', display: 'flex', flexDirection: 'column', background: 'var(--bg)', overflow: 'hidden' }}>
       
       {/* Top Navigation */}
       <Navbar 
@@ -164,10 +164,18 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <footer style={{ borderTop: '1px solid var(--border)', padding: '16px 0', background: 'var(--surface)', fontSize: '0.75rem', color: 'var(--muted)' }}>
-        <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-          <div>Sentinel AI Governance Engine · IBM Bob Hackathon 2.0</div>
-          <div>Created by @hyperlane</div>
+      <footer className="app-footer">
+        <div className="container app-footer-inner">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap', justifyContent: 'center' }}>
+            <span style={{ fontWeight: 600, color: 'var(--ink)' }}>Sentinel</span>
+            <span>AI Governance Engine</span>
+            <span>·</span>
+            <span>IBM Bob Hackathon 2.0</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap', justifyContent: 'center' }}>
+            <span>Created by</span>
+            <span style={{ fontWeight: 600, color: 'var(--ink)' }}>@hyperlane</span>
+          </div>
         </div>
       </footer>
 
