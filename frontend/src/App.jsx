@@ -166,7 +166,7 @@ export default function App() {
       {/* Footer */}
       <footer style={{ borderTop: '1px solid var(--border)', padding: '16px 0', background: 'var(--surface)', fontSize: '0.75rem', color: 'var(--muted)' }}>
         <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-          <div>Sentinel AI Governance Engine · IBM Bob Hackathon</div>
+          <div>Sentinel AI Governance Engine · IBM Bob Hackathon 2.0</div>
           <div>Created by @hyperlane</div>
         </div>
       </footer>

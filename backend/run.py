@@ -16,6 +16,6 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 8000))
     host = os.getenv("HOST", "0.0.0.0")
-    print(f"[*] Sentinel Python Backend starting on http://localhost:{port}")
-    print(f"[*] OpenAPI Documentation available at http://localhost:{port}/docs")
+    print(f"Sentinel starting on http://localhost:{port}")
+    print(f"OpenAPI Documentation available at http://localhost:{port}/docs")
     uvicorn.run("app.main:app", host=host, port=port, reload=False)

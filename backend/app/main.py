@@ -17,7 +17,7 @@ async def lifespan(app: FastAPI):
     yield
 
 app = FastAPI(
-    title="Sentinel — Agent Trust & Governance API",
+    title="Sentinel",
     description="Cryptographic trust, risk analysis, policy control, and tamper-evident audit layer for IBM Bob autonomous coding agents.",
     version="1.0.0",
     lifespan=lifespan
